@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class GameBoard extends JPanel{
@@ -7,9 +9,10 @@ public class GameBoard extends JPanel{
     private static final int BoardX = 20;
     private static final int BoardY = 15;
     private static final int SpotSize =30;
-    private enum Direction { RIGHT, UP, LEFT, DOWN };
     private int[][] board;
     private Snake s;
+
+    private Timer t;
 
     public GameBoard(){
 
@@ -18,6 +21,9 @@ public class GameBoard extends JPanel{
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
         board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
         board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;
+
+        t= new Timer(1000, taskPerformer);
+        t.start();
 
     }
 
@@ -42,8 +48,10 @@ public class GameBoard extends JPanel{
             while (!menu) {
                 return;
             }
-            System.out.println(2);
-            repaint();
+            //System.out.println(s.getHeadPos()[0]);
+            System.out.println(board[3][3]);
+            //s.disPos(0);
+            //repaint();
         }
 
     }
@@ -51,7 +59,7 @@ public class GameBoard extends JPanel{
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); //clears display
 
-        //updateBoard();
+        updateBoard();
         for (int i = 0; i < BoardX; ++i) {
             for (int j = 0; j < BoardY; ++j) {
                 if (board[i][j] == 0)
@@ -67,12 +75,20 @@ public class GameBoard extends JPanel{
     }
 
     public void updateBoard(){
-
+        board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
+        board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
     }
 
     public void paintSpot(int x, int y, Color c, Graphics g) {
         g.setColor(c);
         g.fillRect(x* SpotSize, y*SpotSize, SpotSize, SpotSize);
     }
+
+    ActionListener taskPerformer = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            s.updatePositions();
+            repaint();
+        }
+    };
 
 }
