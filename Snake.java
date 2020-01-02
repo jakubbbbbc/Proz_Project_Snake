@@ -19,7 +19,7 @@ public class Snake {
             tailPos = new int[]{headPos[0], headPos[1]};
         }
         else for (int i = 1; i < length; ++i) {
-            int[] temp = new int[]{headPos[0] - 1, headPos[1]};
+            int[] temp = new int[]{headPos[0] - i, headPos[1]};
             positions.add(temp);
             if (1 == i) prevHeadPos = temp;
             if (length - 1 == i) tailPos = temp;
