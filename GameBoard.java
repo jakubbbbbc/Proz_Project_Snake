@@ -2,39 +2,46 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 
 public class GameBoard extends JPanel{
 
     private static final int BoardX = 20;
     private static final int BoardY = 15;
-    private static final int SpotSize =30;
+    private static final int SpotSize = 30;
+    private static final int DELAY = 100;
     private int[][] board;
+    private int[] applePos;
     private Snake s;
     private boolean done;
+    private boolean alreadyMoved;
 
     private Timer t;
 
     public GameBoard(){
 
         board = new int[BoardX][BoardY];
+
+        newApple();
+
         s = new Snake(new int[] {2,3}, 3);
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
         board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
         board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;
 
         done = false;
+        alreadyMoved= false;
 
         addKeyBind("RIGHT", 0);
         addKeyBind("UP", 1);
         addKeyBind("LEFT", 2);
         addKeyBind("DOWN", 3);
 
-        t= new Timer(100, taskPerformer);
+        t= new Timer(DELAY, taskPerformer);
         t.start();
 
     }
-
 
     public void game(){
 
@@ -76,9 +83,16 @@ public class GameBoard extends JPanel{
                 else if (board[i][j] == 2)
                     paintSpot(i, j, Color.darkGray, g); // Head
                 else if (board[i][j] == 3)
-                    paintSpot(i, j, Color.RED, g); // Food
+                    paintSpot(i, j, Color.RED, g); // Apple
             }
         }
+    }
+
+    public void newApple(){
+        applePos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
+        if (board[applePos[0]][applePos[1]] != 0)
+            newApple();
+        board[applePos[0]][applePos[1]] =3;
     }
 
     public boolean updateHead(){
@@ -90,6 +104,9 @@ public class GameBoard extends JPanel{
             return false;
         }
         else{
+            if (board[hpx][hpy] == 3){
+                newApple();
+            }
             board[hpx][hpy] = 2;
             board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
             return true;
@@ -114,6 +131,7 @@ public class GameBoard extends JPanel{
             s.updatePositions();
             if (updateHead())
                 repaint();
+            alreadyMoved= false;
             //System.out.println(s.getHeadPos()[0]);
         }
     };
@@ -122,7 +140,9 @@ public class GameBoard extends JPanel{
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), key);
         getActionMap().put(key, new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                s.changeDir(newDir);
+                if (!alreadyMoved)
+                    s.changeDir(newDir);
+                alreadyMoved = true;
             }
         });
     }
