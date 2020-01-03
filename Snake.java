@@ -45,6 +45,10 @@ public class Snake<headPos> {
         return tailPos;
     }
 
+    public boolean getHasEaten(){
+        return hasEaten;
+    }
+
     public int getLength() {
         return length;
     }
@@ -60,7 +64,7 @@ public class Snake<headPos> {
         }
         switch (dir){
             case 0://right
-                prevHeadPos[0]=headPos[0];
+                prevHeadPos=new int[] {headPos[0], headPos[1]};
                 headPos= new int[] {headPos[0]+1, headPos[1]};
                 break;
             case 1://up
@@ -71,6 +75,11 @@ public class Snake<headPos> {
                 System.out.println("Wrong direction!");
         }
         positions.add(headPos);
+    }
+
+    public void changeDir(int newDir){
+        if (newDir%2 != dir%2)
+            dir=newDir;
     }
 
 
