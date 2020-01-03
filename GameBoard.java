@@ -10,71 +10,72 @@ public class GameBoard extends JPanel{
     private static final int BoardX = 20;
     private static final int BoardY = 15;
     private static final int SpotSize = 30;
-    private static final int DELAY = 100;
+    private static final int DELAY = 200;
     private int[][] board;
     private int[] applePos;
     private Snake s;
-    private boolean done;
+   // private boolean done;
     private boolean alreadyMoved;
-
+    private boolean menu;
     private Timer t;
 
     public GameBoard(){
-
-        board = new int[BoardX][BoardY];
-
+        /*board = new int[BoardX][BoardY];
         newApple();
-
         s = new Snake(new int[] {2,3}, 3);
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
         board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
-        board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;
-
-        done = false;
+        board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;*/
+        //done = false;
         alreadyMoved= false;
+        menu = true;
 
         addKeyBind("RIGHT", 0);
         addKeyBind("UP", 1);
         addKeyBind("LEFT", 2);
         addKeyBind("DOWN", 3);
 
+        addKeySpace();
+        addKeyP();
         t= new Timer(DELAY, taskPerformer);
-        t.start();
+        //t.start();
 
     }
 
-    public void game(){
-
+    public JFrame iniGUI(){
         JFrame f=new JFrame("Snake");//creating instance of JFrame
         //setPreferredSize(new Dimension(800, 800));
         f.setSize(BoardX * SpotSize+15, BoardY * SpotSize+37);
         //f.setSize(800,400);
         f.setVisible(true);//making the frame visible
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        return f;
+    }
+
+    public void game(){
 
         GameBoard b= new GameBoard();
-        f.add(b);
-
+        iniGUI().add(b);
         //game loop
-        while (!done) {
-
-            t.restart();
-            boolean running = true;
-            boolean menu = true;
-
-            while (!menu) {
-                return;
+        /*while (true) {
+            //System.out.println(s.getHeadPos()[0]);
+            if (menu){
+                System.out.println("menu");
             }
-
-            //System.out.println(board[3][3]);
-            //s.disPos(0);
-        }
-
+            //t.restart(); żeby nie pisało dwa razy??
+            //System.out.println(s.getHeadPos()[0]);
+        }*/
     }
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); //clears display
-        for (int i = 0; i < BoardX; ++i) {
+        if (menu){
+            //TODO display score/highScore i press space to play
+            g.setColor(Color.black);
+            g.setFont(new Font("Monaco", Font.PLAIN, 40));
+            g.drawString("Press Space to Play", 120, BoardY*SpotSize/2+80);
+        }
+        else for (int i = 0; i < BoardX; ++i) {
             for (int j = 0; j < BoardY; ++j) {
                 if (board[i][j] == 0)
                     paintSpot(i, j, Color.white, g); // Background
@@ -88,18 +89,25 @@ public class GameBoard extends JPanel{
         }
     }
 
+    public void paintSpot(int x, int y, Color c, Graphics g) {
+        g.setColor(c);
+        g.fillRect(x* SpotSize, y*SpotSize, SpotSize, SpotSize);
+    }
+
     public void newApple(){
         applePos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
         if (board[applePos[0]][applePos[1]] != 0)
             newApple();
-        board[applePos[0]][applePos[1]] =3;
+        board[applePos[0]][applePos[1]] = 3;
     }
 
     public boolean updateHead(){
         int hpx = s.getHeadPos()[0], hpy= s.getHeadPos()[1];
         if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY) {
-            done = true;
-            t.stop();
+            //System.out.println(done);
+            //done = true;
+            //System.out.println(done);
+            //t.stop();
             System.out.println("pozycja "+ hpx + " jest slaba");
             return false;
         }
@@ -118,23 +126,61 @@ public class GameBoard extends JPanel{
             board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
 
-    public void paintSpot(int x, int y, Color c, Graphics g) {
-        g.setColor(c);
-        g.fillRect(x* SpotSize, y*SpotSize, SpotSize, SpotSize);
-    }
-
     ActionListener taskPerformer = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            //s.disPos(0);
-            //System.out.println(s.getHeadPos()[0]);
-            updateTail();
-            s.updatePositions();
-            if (updateHead())
-                repaint();
-            alreadyMoved= false;
-            //System.out.println(s.getHeadPos()[0]);
+            if (!menu){
+                //s.disPos(0);
+                //System.out.println(menu);
+                updateTail();
+                s.updatePositions();
+                if (updateHead())
+                    repaint();
+                else {
+                    menu = true;
+                    repaint();
+                }
+                alreadyMoved= false;
+                System.out.println(s.getHeadPos()[0]);
+            }
         }
     };
+
+    public void addKeySpace() {
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "keySpace");
+        getActionMap().put("keySpace", new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                //System.out.print("lalalal");
+                if (menu){
+                    menu = false;
+                    board = new int[BoardX][BoardY];
+
+                    newApple();
+
+                    s = new Snake(new int[] {2,3}, 3);
+                    board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
+                    board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
+                    board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;
+                    t.start();
+                }
+            }
+        });
+    }
+
+    public void addKeyP() {
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "keyP");
+        getActionMap().put("keyP", new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                if (!menu) {
+                    System.out.println("P pressed");
+                    if (t.isRunning())
+                        t.stop();
+                    else
+                        t.restart();
+                }
+
+            }
+        });
+    }
 
     public void addKeyBind(String key, int newDir) {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), key);
@@ -143,8 +189,10 @@ public class GameBoard extends JPanel{
                 if (!alreadyMoved)
                     s.changeDir(newDir);
                 alreadyMoved = true;
+               // done= true;
             }
         });
     }
+
 
 }
