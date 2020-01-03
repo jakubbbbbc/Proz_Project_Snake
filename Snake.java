@@ -49,6 +49,10 @@ public class Snake<headPos> {
         return hasEaten;
     }
 
+    public void setHasEaten (boolean he){
+        hasEaten = he;
+    }
+
     public int getLength() {
         return length;
     }
@@ -61,6 +65,10 @@ public class Snake<headPos> {
         if (!hasEaten){
             positions.remove(tailPos);
             tailPos= positions.get(0);
+        }
+        else{
+            hasEaten = false;
+            ++length;
         }
         prevHeadPos=new int[] {headPos[0], headPos[1]};
         switch (dir){

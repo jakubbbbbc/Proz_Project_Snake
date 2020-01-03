@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
 
 
 public class GameBoard extends JPanel{
@@ -10,7 +9,7 @@ public class GameBoard extends JPanel{
     private static final int BoardX = 20;
     private static final int BoardY = 15;
     private static final int SpotSize = 30;
-    private static final int DELAY = 200;
+    private static final int DELAY = 150;
     private int[][] board;
     private int[] applePos;
     private Snake s;
@@ -18,6 +17,8 @@ public class GameBoard extends JPanel{
     private boolean alreadyMoved;
     private boolean menu;
     private Timer t;
+    private int score;
+    private int highScore;
 
     public GameBoard(){
         /*board = new int[BoardX][BoardY];
@@ -29,6 +30,9 @@ public class GameBoard extends JPanel{
         //done = false;
         alreadyMoved= false;
         menu = true;
+
+        //TODO highScore z pliku;
+        highScore = 0;
 
         addKeyBind("RIGHT", 0);
         addKeyBind("UP", 1);
@@ -45,7 +49,7 @@ public class GameBoard extends JPanel{
     public JFrame iniGUI(){
         JFrame f=new JFrame("Snake");//creating instance of JFrame
         //setPreferredSize(new Dimension(800, 800));
-        f.setSize(BoardX * SpotSize+15, BoardY * SpotSize+37);
+        f.setSize(BoardX * SpotSize+15, BoardY * SpotSize+37+30); // 15 = poprawka, 37 = poprawka, 30 = na scorsy
         //f.setSize(800,400);
         f.setVisible(true);//making the frame visible
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -69,6 +73,12 @@ public class GameBoard extends JPanel{
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); //clears display
+
+        g.setColor(Color.black);
+        g.setFont(new Font("Monaco", Font.BOLD, 15));
+        g.drawString("Score: "+score, 0, BoardY * SpotSize+20); //+20 = poprawka
+        g.drawString("High score: "+highScore, 100, BoardY * SpotSize+20);
+
         if (menu){
             //TODO display score/highScore i press space to play
             g.setColor(Color.black);
@@ -103,17 +113,22 @@ public class GameBoard extends JPanel{
 
     public boolean updateHead(){
         int hpx = s.getHeadPos()[0], hpy= s.getHeadPos()[1];
-        if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY) {
+        if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1) {
             //System.out.println(done);
             //done = true;
             //System.out.println(done);
             //t.stop();
-            System.out.println("pozycja "+ hpx + " jest slaba");
+            System.out.println("pozycja "+ hpx + ", " + hpy + " jest słaba");
             return false;
         }
         else{
             if (board[hpx][hpy] == 3){
                 newApple();
+                s.setHasEaten(true);
+                ++score;
+                if (score>highScore)
+                    highScore = score;
+                System.out.println(score+"\n"+highScore+"\n");
             }
             board[hpx][hpy] = 2;
             board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
@@ -140,7 +155,7 @@ public class GameBoard extends JPanel{
                     repaint();
                 }
                 alreadyMoved= false;
-                System.out.println(s.getHeadPos()[0]);
+                //System.out.println(s.getLength());
             }
         }
     };
@@ -155,6 +170,7 @@ public class GameBoard extends JPanel{
                     board = new int[BoardX][BoardY];
 
                     newApple();
+                    score = 0;
 
                     s = new Snake(new int[] {2,3}, 3);
                     board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
