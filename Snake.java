@@ -62,14 +62,19 @@ public class Snake<headPos> {
             positions.remove(tailPos);
             tailPos= positions.get(0);
         }
+        prevHeadPos=new int[] {headPos[0], headPos[1]};
         switch (dir){
             case 0://right
-                prevHeadPos=new int[] {headPos[0], headPos[1]};
                 headPos= new int[] {headPos[0]+1, headPos[1]};
                 break;
             case 1://up
-                prevHeadPos[1]=headPos[1];
-                --headPos[1];
+                headPos= new int[] {headPos[0], headPos[1]-1};
+                break;
+            case 2://left
+                headPos= new int[] {headPos[0]-1, headPos[1]};
+                break;
+            case 3://down
+                headPos= new int[] {headPos[0], headPos[1]+1};
                 break;
             default:
                 System.out.println("Wrong direction!");

@@ -30,7 +30,7 @@ public class GameBoard extends JPanel{
         addKeyBind("LEFT", 2);
         addKeyBind("DOWN", 3);
 
-        t= new Timer(1000, taskPerformer);
+        t= new Timer(100, taskPerformer);
         t.start();
 
     }
@@ -118,13 +118,12 @@ public class GameBoard extends JPanel{
         }
     };
 
-    public void addKeyBind(String key, int dir) {
-        getInputMap().put(KeyStroke.getKeyStroke(key), key);
+    public void addKeyBind(String key, int newDir) {
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), key);
         getActionMap().put(key, new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                s.changeDir(dir);
+                s.changeDir(newDir);
             }
-
         });
     }
 
