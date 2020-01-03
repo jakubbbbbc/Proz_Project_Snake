@@ -83,8 +83,8 @@ public class GameBoard extends JPanel{
 
     ActionListener taskPerformer = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            //System.out.println(s.getTailPos()[0]);
-            s.disPos(2);
+            System.out.println(s.getTailPos()[0]);
+            //s.disPos(0);
             s.updatePositions();
             repaint();
 

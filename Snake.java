@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Snake {
+public class Snake<headPos> {
 
     private int[] headPos, prevHeadPos, tailPos;
     private int length;
@@ -15,8 +15,8 @@ public class Snake {
         hasEaten=false;
         dir = 0;//right
         positions = new ArrayList<int[]>();
-        positions.add(headPos);
-        if (1 == length) {
+        //positions.add(headPos);
+        /*if (1 == length) {
             prevHeadPos = null;
             tailPos = new int[]{headPos[0], headPos[1]};
         }
@@ -25,7 +25,12 @@ public class Snake {
             positions.add(0, temp);
             if (1 == i) prevHeadPos = temp;
             if (length - 1 == i) tailPos = temp;
-        }
+        }*/
+        prevHeadPos = new int[] {headPos[0]-1, headPos[1] };
+        tailPos = new int[] {headPos[0]-2, headPos[1] };
+        positions.add(tailPos);
+        positions.add(prevHeadPos);
+        positions.add(headPos);
     }
 
     public int[] getHeadPos() {
@@ -50,13 +55,13 @@ public class Snake {
 
     public void updatePositions() {
         if (!hasEaten){
-            positions.remove(0);
+            positions.remove(tailPos);
             tailPos= positions.get(0);
         }
         switch (dir){
             case 0://right
                 prevHeadPos[0]=headPos[0];
-                headPos[0]+=1;
+                headPos= new int[] {headPos[0]+1, headPos[1]};
                 break;
             case 1://up
                 prevHeadPos[1]=headPos[1];
