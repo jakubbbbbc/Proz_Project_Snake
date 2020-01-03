@@ -48,17 +48,14 @@ public class GameBoard extends JPanel{
             while (!menu) {
                 return;
             }
-            //System.out.println(s.getHeadPos()[0]);
-            System.out.println(board[3][3]);
+            //System.out.println(board[3][3]);
             //s.disPos(0);
-            //repaint();
         }
 
     }
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); //clears display
-
         updateBoard();
         for (int i = 0; i < BoardX; ++i) {
             for (int j = 0; j < BoardY; ++j) {
@@ -86,8 +83,12 @@ public class GameBoard extends JPanel{
 
     ActionListener taskPerformer = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
+            //System.out.println(s.getTailPos()[0]);
+            s.disPos(2);
             s.updatePositions();
             repaint();
+
+
         }
     };
 

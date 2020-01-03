@@ -55,7 +55,7 @@ public class Snake {
         }
         switch (dir){
             case 0://right
-                //prevHeadPos[0]=headPos[0];
+                prevHeadPos[0]=headPos[0];
                 headPos[0]+=1;
                 break;
             case 1://up
@@ -64,9 +64,8 @@ public class Snake {
                 break;
             default:
                 System.out.println("Wrong direction!");
-
-
         }
+        positions.add(headPos);
     }
 
 
