@@ -2,6 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 
 public class GameBoard extends JPanel{
@@ -31,8 +35,7 @@ public class GameBoard extends JPanel{
         alreadyMoved= false;
         menu = true;
 
-        //TODO highScore z pliku;
-        highScore = 0;
+        readHighScore();
 
         addKeyBind("RIGHT", 0);
         addKeyBind("UP", 1);
@@ -80,7 +83,7 @@ public class GameBoard extends JPanel{
         g.drawString("High score: "+highScore, 100, BoardY * SpotSize+20);
 
         if (menu){
-            //TODO display score/highScore i press space to play
+            //TODO display highScore and player
             g.setColor(Color.black);
             g.setFont(new Font("Monaco", Font.PLAIN, 40));
             g.drawString("Press Space to Play", 120, BoardY*SpotSize/2+80);
@@ -126,8 +129,10 @@ public class GameBoard extends JPanel{
                 newApple();
                 s.setHasEaten(true);
                 ++score;
-                if (score>highScore)
+                if (score>highScore) {
                     highScore = score;
+                    saveHighScore();
+                }
                 System.out.println(score+"\n"+highScore+"\n");
             }
             board[hpx][hpy] = 2;
@@ -208,6 +213,34 @@ public class GameBoard extends JPanel{
                // done= true;
             }
         });
+    }
+
+    public void saveHighScore(){
+        try {
+            PrintWriter out = new PrintWriter("highScore.txt");
+            out.println(highScore);
+            out.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println("Niestety, nie mogę utworzyć pliku!");
+        }
+    }
+
+    public void readHighScore(){
+        File reader = new File("highScore.txt");
+       // String odczyt = "";
+        try {
+            // Utworzenie obiektu typu String
+            Scanner sc = new Scanner(reader);
+            highScore=Integer.parseInt(sc.next());
+            // Odczytywanie kolejnych linii pliku dopóki są kolejne linie
+            /*while (sc.hasNextLine()) {
+                // Do łańcucha znaków dodawana jest zawartość kolejnej linii
+                // oraz znak \n oznaczający następną linię
+                odczyt = odczyt + skaner.nextLine() + "\n";
+            }*/
+        } catch (FileNotFoundException e) {
+            System.out.println("Brak Pliku do odczytania!");
+        }
     }
 
 
