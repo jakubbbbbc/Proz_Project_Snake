@@ -13,9 +13,9 @@ public class GameBoard extends JPanel{
     private static final int BoardX = 20;
     private static final int BoardY = 15;
     private static final int SpotSize = 30;
-    private static final int DELAY = 150;
+    private static final int DELAY = 100;
     private int[][] board;
-    private int[] applePos;
+   // private int[] applePos;
     private Snake s;
    // private boolean done;
     private boolean alreadyMoved;
@@ -23,6 +23,7 @@ public class GameBoard extends JPanel{
     private Timer t;
     private int score;
     private int highScore;
+    private int boostCount;
 
     public GameBoard(){
         /*board = new int[BoardX][BoardY];
@@ -90,14 +91,25 @@ public class GameBoard extends JPanel{
         }
         else for (int i = 0; i < BoardX; ++i) {
             for (int j = 0; j < BoardY; ++j) {
-                if (board[i][j] == 0)
-                    paintSpot(i, j, Color.white, g); // Background
-                else if (board[i][j] == 1)
-                    paintSpot(i, j, Color.gray, g); // Body
-                else if (board[i][j] == 2)
-                    paintSpot(i, j, Color.darkGray, g); // Head
-                else if (board[i][j] == 3)
-                    paintSpot(i, j, Color.RED, g); // Apple
+                switch (board[i][j]){
+                    case 0:
+                        paintSpot(i, j, Color.white, g); // Background
+                        break;
+                    case 1:
+                        paintSpot(i, j, Color.gray, g); // Body
+                        break;
+                    case 2:
+                        paintSpot(i, j, Color.darkGray, g); // Head
+                        break;
+                    case 3:
+                        paintSpot(i, j, Color.RED, g); // Apple
+                        break;
+                    case 4:
+                        paintSpot(i, j, Color.blue, g); // delay+10
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -108,10 +120,19 @@ public class GameBoard extends JPanel{
     }
 
     public void newApple(){
-        applePos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
+        int[] applePos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
         if (board[applePos[0]][applePos[1]] != 0)
             newApple();
         board[applePos[0]][applePos[1]] = 3;
+        System.out.println("apple pos: " + applePos[0] + ", " + applePos[1]);
+    }
+
+    public void newBoost(){
+        int[] boostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
+        if (board[boostPos[0]][boostPos[1]] != 0)
+            newApple();
+        board[boostPos[0]][boostPos[1]] = (int) (Math.random()*1+4); //boost type
+        System.out.println("boost pos: " + boostPos[0] + ", " + boostPos[1]);
     }
 
     public boolean updateHead(){
@@ -125,20 +146,41 @@ public class GameBoard extends JPanel{
             return false;
         }
         else{
-            if (board[hpx][hpy] == 3){
-                newApple();
-                s.setHasEaten(true);
-                ++score;
-                if (score>highScore) {
-                    highScore = score;
-                    saveHighScore();
-                }
-                System.out.println(score+"\n"+highScore+"\n");
-            }
+            if (board[hpx][hpy] > 2)
+                hasEaten();
             board[hpx][hpy] = 2;
             board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
             return true;
         }
+    }
+
+    public void hasEaten() {
+        s.setHasEaten(true);
+        //what food?
+        switch (board[s.getHeadPos()[0]][s.getHeadPos()[1]]){
+            case 3: //apple
+                newApple();
+                ++score;
+                if (t.getDelay()>50)
+                    t.setDelay(t.getDelay()-2);
+                break;
+            case 4: // delay+10
+                t.setDelay(t.getDelay()+10);
+                break;
+            default:
+                break;
+        }
+        System.out.println("Delay: "+t.getDelay());
+        if (score/5 > boostCount){ // new booster every 5 points;
+            newBoost();
+            ++boostCount;
+        }
+
+        if (score>highScore) {
+            highScore = score;
+            saveHighScore();
+        }
+        //System.out.println(score+"\n"+highScore+"\n");
     }
 
     public void updateTail(){
@@ -171,20 +213,26 @@ public class GameBoard extends JPanel{
             public void actionPerformed(ActionEvent arg0) {
                 //System.out.print("lalalal");
                 if (menu){
+                    gameIni();
                     menu = false;
-                    board = new int[BoardX][BoardY];
-
-                    newApple();
-                    score = 0;
-
-                    s = new Snake(new int[] {2,3}, 3);
-                    board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
-                    board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
-                    board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;
-                    t.start();
                 }
             }
         });
+    }
+
+    public void gameIni(){
+        board = new int[BoardX][BoardY];
+
+        newApple();
+        score = 0;
+        boostCount=0;
+
+        s = new Snake(new int[] {2,3}, 3);
+        board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
+        board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
+        board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;
+        t.setDelay(DELAY);
+        t.start();
     }
 
     public void addKeyP() {
