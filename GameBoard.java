@@ -45,6 +45,7 @@ public class GameBoard extends JPanel{
 
         addKeySpace();
         addKeyP();
+        addKeyL();
         t= new Timer(DELAY, taskPerformer);
         //t.start();
 
@@ -107,6 +108,9 @@ public class GameBoard extends JPanel{
                     case 4:
                         paintSpot(i, j, Color.blue, g); // delay+10
                         break;
+                    case 5:
+                        paintSpot(i, j, Color.ORANGE, g); // length-5
+                        break;
                     default:
                         break;
                 }
@@ -124,23 +128,20 @@ public class GameBoard extends JPanel{
         if (board[applePos[0]][applePos[1]] != 0)
             newApple();
         board[applePos[0]][applePos[1]] = 3;
-        System.out.println("apple pos: " + applePos[0] + ", " + applePos[1]);
+       //m.out.println("apple pos: " + applePos[0] + ", " + applePos[1]);
     }
 
     public void newBoost(){
         int[] boostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
         if (board[boostPos[0]][boostPos[1]] != 0)
             newApple();
-        board[boostPos[0]][boostPos[1]] = (int) (Math.random()*1+4); //boost type
-        System.out.println("boost pos: " + boostPos[0] + ", " + boostPos[1]);
+        board[boostPos[0]][boostPos[1]] = (int) (Math.random()*1+5); //boost type
+        //System.out.println("boost pos: " + boostPos[0] + ", " + boostPos[1]);
     }
 
     public boolean updateHead(){
         int hpx = s.getHeadPos()[0], hpy= s.getHeadPos()[1];
         if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1) {
-            //System.out.println(done);
-            //done = true;
-            //System.out.println(done);
             //t.stop();
             System.out.println("pozycja "+ hpx + ", " + hpy + " jest słaba");
             return false;
@@ -155,22 +156,26 @@ public class GameBoard extends JPanel{
     }
 
     public void hasEaten() {
-        s.setHasEaten(true);
         //what food?
         switch (board[s.getHeadPos()[0]][s.getHeadPos()[1]]){
             case 3: //apple
-                newApple();
+                s.setHasEaten(true);
                 ++score;
+                newApple();
                 if (t.getDelay()>50)
                     t.setDelay(t.getDelay()-2);
                 break;
             case 4: // delay+10
                 t.setDelay(t.getDelay()+10);
                 break;
+            case 5:
+                shortLength(5);
+                //System.out.println("length "+s.getLength()+" pos.size: "+s.getPos().size());
+                break;
             default:
                 break;
         }
-        System.out.println("Delay: "+t.getDelay());
+        //System.out.println("Delay: "+t.getDelay());
         if (score/5 > boostCount){ // new booster every 5 points;
             newBoost();
             ++boostCount;
@@ -181,6 +186,14 @@ public class GameBoard extends JPanel{
             saveHighScore();
         }
         //System.out.println(score+"\n"+highScore+"\n");
+    }
+
+    public void shortLength(int n){
+        for (int i=0; i<n; ++i){
+            board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
+            s.removeTail();
+        }
+        //board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
 
     public void updateTail(){
@@ -245,6 +258,19 @@ public class GameBoard extends JPanel{
                         t.stop();
                     else
                         t.restart();
+                }
+
+            }
+        });
+    }
+
+    public void addKeyL() {
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("L"), "keyL");
+        getActionMap().put("keyL", new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                if (!menu) {
+                    System.out.println("L pressed");
+
                 }
 
             }

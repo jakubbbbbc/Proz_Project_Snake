@@ -57,8 +57,8 @@ public class Snake<headPos> {
         return length;
     }
 
-    public void disPos (int i) {
-        System.out.println(positions.get(i)[0]);
+    public ArrayList<int[]> getPos () {
+        return positions;
     }
 
     public void updatePositions() {
@@ -93,6 +93,12 @@ public class Snake<headPos> {
     public void changeDir(int newDir){
         if (newDir%2 != dir%2)
             dir=newDir;
+    }
+
+    public void removeTail(){
+        positions.remove(tailPos);
+        tailPos= positions.get(0);
+        --length;
     }
 
 
