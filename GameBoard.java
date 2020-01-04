@@ -111,6 +111,9 @@ public class GameBoard extends JPanel{
                     case 5:
                         paintSpot(i, j, Color.ORANGE, g); // length-5
                         break;
+                    case 6:
+                        paintSpot(i, j, Color.BLACK, g); // length-5
+                        break;
                     default:
                         break;
                 }
@@ -135,8 +138,9 @@ public class GameBoard extends JPanel{
         int[] boostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
         if (board[boostPos[0]][boostPos[1]] != 0)
             newApple();
-        board[boostPos[0]][boostPos[1]] = (int) (Math.random()*1+5); //boost type
+        board[boostPos[0]][boostPos[1]] = (int) (Math.random()*1+6); //boost type, +4 default
         //System.out.println("boost pos: " + boostPos[0] + ", " + boostPos[1]);
+        System.out.println(board[boostPos[0]][boostPos[1]]);
     }
 
     public boolean updateHead(){
@@ -171,6 +175,9 @@ public class GameBoard extends JPanel{
             case 5:
                 shortLength(5);
                 //System.out.println("length "+s.getLength()+" pos.size: "+s.getPos().size());
+                break;
+            case 6:
+                //TODO co robi booster nr 6
                 break;
             default:
                 break;
@@ -270,6 +277,8 @@ public class GameBoard extends JPanel{
             public void actionPerformed(ActionEvent arg0) {
                 if (!menu) {
                     System.out.println("L pressed");
+                    int x =(int) (Math.random()*2+4); //boost type
+                    System.out.println(x);
 
                 }
 
