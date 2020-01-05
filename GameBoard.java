@@ -14,6 +14,8 @@ public class GameBoard extends JPanel{
     private static final int BoardY = 15;
     private static final int SpotSize = 30;
     private static final int DELAY = 200; //200 default
+    private static final int DisplayDelay = 3000; // for messages
+    private static final int BoosterDelay= 6000; //200 default
     private int[][] board;
    // private int[] applePos;
     private Snake s;
@@ -21,9 +23,13 @@ public class GameBoard extends JPanel{
     private boolean alreadyMoved;
     private boolean menu;
     private Timer t;
+    private Timer disT;
     private int score;
     private int highScore;
     private int boostCount;
+    private int messageID;
+    private ImageIcon appleImage;
+
 
     public GameBoard(){
         /*board = new int[BoardX][BoardY];
@@ -46,8 +52,11 @@ public class GameBoard extends JPanel{
         addKeySpace();
         addKeyP();
         addKeyL();
-        t= new Timer(DELAY, taskPerformer);
+        t= new Timer(DELAY, defalutTimerAction);
+        disT = new Timer(DisplayDelay, disTAction);
         //t.start();
+
+        appleImage = new ImageIcon("apple1.png");
 
     }
 
@@ -83,6 +92,8 @@ public class GameBoard extends JPanel{
         g.setFont(new Font("Monaco", Font.BOLD, 15));
         g.drawString("Score: "+score, 0, BoardY * SpotSize+20); //+20 = poprawka
         g.drawString("High score: "+highScore, 100, BoardY * SpotSize+20);
+        if (disT.isRunning())
+            displayMessage(messageID, g);
 
         if (menu){
             //TODO display highScore and player
@@ -103,7 +114,7 @@ public class GameBoard extends JPanel{
                         paintSpot(i, j, Color.darkGray, g); // Head
                         break;
                     case 3:
-                        paintSpot(i, j, Color.RED, g); // Apple
+                        paintImage(i, j, appleImage, g); // Apple
                         break;
                     case 4:
                         paintSpot(i, j, Color.blue, g); // delay+10
@@ -121,9 +132,37 @@ public class GameBoard extends JPanel{
         }
     }
 
+    public void displayMessage(int messageID, Graphics g){
+        String message = "";
+        switch (messageID){
+            case 3:
+                //for apple, don't change the message
+                break;
+            case 4:
+                message = "Snake is now slower!";
+                break;
+            case 5:
+                message = "Snake is now shorter!";
+                break;
+            case 6:
+                message = "Bonus 3 points received!";
+                break;
+            default:
+                message = "";
+                System.out.println("Wrong message ID, go to displayMessage()");
+                break;
+        }
+        g.drawString(message, 250, BoardY * SpotSize+20);
+    }
+
     public void paintSpot(int x, int y, Color c, Graphics g) {
         g.setColor(c);
+        //appleImage.paintIcon(this, g, x* SpotSize, y*SpotSize);
         g.fillRect(x* SpotSize, y*SpotSize, SpotSize, SpotSize);
+    }
+
+    public void paintImage(int x, int y, ImageIcon icon, Graphics g){
+        icon.paintIcon(this, g, x* SpotSize, y*SpotSize);
     }
 
     public void newApple(){
@@ -169,7 +208,9 @@ public class GameBoard extends JPanel{
 
     public void hasEaten() {
         //what food?
-        switch (board[s.getHeadPos()[0]][s.getHeadPos()[1]]){
+        int atHeadPos = board[s.getHeadPos()[0]][s.getHeadPos()[1]];
+        messageID = atHeadPos;
+        switch (atHeadPos){
             case 3: //apple
                 s.setHasEaten(true);
                 ++score;
@@ -179,18 +220,21 @@ public class GameBoard extends JPanel{
                 break;
             case 4: // delay+10
                 t.setDelay(t.getDelay()+6);
+                disT.start();
                 break;
-            case 5:
+            case 5: // shorter by 3
                 makeShorter(3);
+                disT.start();
                 //System.out.println("length "+s.getLength()+" pos.size: "+s.getPos().size());
                 break;
-            case 6:
-                //TODO co robi booster nr 6
+            case 6: // bonus points
                 score+=3;
+                disT.start();
                 break;
             default:
                 break;
         }
+        //disT.start();
         //System.out.println("Delay: "+t.getDelay());
         if (score/5 > boostCount){ // new booster every 5 points;
             newBoost();
@@ -212,13 +256,12 @@ public class GameBoard extends JPanel{
         //board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
 
-
     public void updateTail(){
         if(!s.getHasEaten())
             board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
 
-    ActionListener taskPerformer = new ActionListener() {
+    ActionListener defalutTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (!menu){
                 //s.disPos(0);
@@ -234,6 +277,14 @@ public class GameBoard extends JPanel{
                 alreadyMoved= false;
                 //System.out.println(s.getLength());
             }
+        }
+    };
+
+    ActionListener disTAction = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            //messageID = 0;
+            disT.stop();
+            disT.setDelay(DisplayDelay);
         }
     };
 
@@ -255,7 +306,8 @@ public class GameBoard extends JPanel{
 
         newApple();
         score = 0;
-        boostCount=0;
+        boostCount = 0;
+        messageID = 0;
 
         s = new Snake(new int[] {2,3}, 3);
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
@@ -285,13 +337,9 @@ public class GameBoard extends JPanel{
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("L"), "keyL");
         getActionMap().put("keyL", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                if (!menu) {
-                    System.out.println("L pressed");
-                    int x =(int) (Math.random()*2+4); //boost type
-                    System.out.println(x);
-
-                }
-
+                System.out.println("L pressed");
+                messageID = 4;
+                disT.start();
             }
         });
     }
