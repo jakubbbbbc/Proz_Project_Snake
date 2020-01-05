@@ -13,7 +13,7 @@ public class GameBoard extends JPanel{
     private static final int BoardX = 20;
     private static final int BoardY = 15;
     private static final int SpotSize = 30;
-    private static final int DELAY = 100;
+    private static final int DELAY = 200; //200 default
     private int[][] board;
    // private int[] applePos;
     private Snake s;
@@ -128,17 +128,25 @@ public class GameBoard extends JPanel{
 
     public void newApple(){
         int[] applePos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
-        if (board[applePos[0]][applePos[1]] != 0)
+        boolean isOk=true;
+        if (board[applePos[0]][applePos[1]] != 0) {
+            isOk = false;
             newApple();
-        board[applePos[0]][applePos[1]] = 3;
+        }
+        if (isOk)
+            board[applePos[0]][applePos[1]] = 3;
        //m.out.println("apple pos: " + applePos[0] + ", " + applePos[1]);
     }
 
     public void newBoost(){
         int[] boostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
-        if (board[boostPos[0]][boostPos[1]] != 0)
-            newApple();
-        board[boostPos[0]][boostPos[1]] = (int) (Math.random()*1+6); //boost type, +4 default
+        boolean isOk = true;
+        if (board[boostPos[0]][boostPos[1]] != 0) {
+            isOk = false;
+            newBoost();
+        }
+        if (isOk)
+            board[boostPos[0]][boostPos[1]] = (int) (Math.random()*3+4); //boost type, default: * NumOfBoosters +4
         //System.out.println("boost pos: " + boostPos[0] + ", " + boostPos[1]);
         System.out.println(board[boostPos[0]][boostPos[1]]);
     }
@@ -170,14 +178,15 @@ public class GameBoard extends JPanel{
                     t.setDelay(t.getDelay()-2);
                 break;
             case 4: // delay+10
-                t.setDelay(t.getDelay()+10);
+                t.setDelay(t.getDelay()+6);
                 break;
             case 5:
-                shortLength(5);
+                makeShorter(3);
                 //System.out.println("length "+s.getLength()+" pos.size: "+s.getPos().size());
                 break;
             case 6:
                 //TODO co robi booster nr 6
+                score+=3;
                 break;
             default:
                 break;
@@ -195,13 +204,14 @@ public class GameBoard extends JPanel{
         //System.out.println(score+"\n"+highScore+"\n");
     }
 
-    public void shortLength(int n){
+    public void makeShorter(int n){
         for (int i=0; i<n; ++i){
             board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
             s.removeTail();
         }
         //board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
+
 
     public void updateTail(){
         if(!s.getHasEaten())
