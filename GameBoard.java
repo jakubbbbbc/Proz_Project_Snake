@@ -15,7 +15,7 @@ public class GameBoard extends JPanel{
     private static final int SpotSize = 30;
     private static final int DELAY = 200; //200 default
     private static final int DisplayDelay = 3000; // for messages
-    private static final int BoosterDelay= 6000; //200 default
+    private static final int BoosterDelay= 10000; //200 default
     private int[][] board;
    // private int[] applePos;
     private Snake s;
@@ -23,10 +23,12 @@ public class GameBoard extends JPanel{
     private boolean alreadyMoved;
     private boolean menu;
     private Timer t;
-    private Timer disT;
+    private Timer messageTimer;
+    private Timer boosterTimer;
     private int score;
     private int highScore;
-    private int boostCount;
+    private int boostCount; // to spawn boosters
+    private int pointBoost; // to multiply points
     private int messageID;
     private ImageIcon appleImage;
 
@@ -52,8 +54,10 @@ public class GameBoard extends JPanel{
         addKeySpace();
         addKeyP();
         addKeyL();
-        t= new Timer(DELAY, defalutTimerAction);
-        disT = new Timer(DisplayDelay, disTAction);
+        t= new Timer(DELAY, defaultTimerAction);
+        messageTimer = new Timer(DisplayDelay, messageTimerAction);
+        boosterTimer = new Timer(BoosterDelay, boosterTimerAction);
+
         //t.start();
 
         appleImage = new ImageIcon("apple1.png");
@@ -92,7 +96,7 @@ public class GameBoard extends JPanel{
         g.setFont(new Font("Monaco", Font.BOLD, 15));
         g.drawString("Score: "+score, 0, BoardY * SpotSize+20); //+20 = poprawka
         g.drawString("High score: "+highScore, 100, BoardY * SpotSize+20);
-        if (disT.isRunning())
+        if (messageTimer.isRunning())
             displayMessage(messageID, g);
 
         if (menu){
@@ -125,6 +129,9 @@ public class GameBoard extends JPanel{
                     case 6:
                         paintSpot(i, j, Color.BLACK, g); // length-5
                         break;
+                    case 7:
+                        paintSpot(i, j, Color.lightGray, g); // length-5
+                        break;
                     default:
                         break;
                 }
@@ -146,6 +153,9 @@ public class GameBoard extends JPanel{
                 break;
             case 6:
                 message = "Bonus 3 points received!";
+                break;
+            case 7:
+                message = "Points count double for " + BoosterDelay/1000 + " seconds!";
                 break;
             default:
                 message = "";
@@ -185,7 +195,7 @@ public class GameBoard extends JPanel{
             newBoost();
         }
         if (isOk)
-            board[boostPos[0]][boostPos[1]] = (int) (Math.random()*3+4); //boost type, default: * NumOfBoosters +4
+            board[boostPos[0]][boostPos[1]] = (int) (Math.random()*4+4); //boost type, default: * NumOfBoosters +4, currently num = 4
         //System.out.println("boost pos: " + boostPos[0] + ", " + boostPos[1]);
         System.out.println(board[boostPos[0]][boostPos[1]]);
     }
@@ -213,28 +223,32 @@ public class GameBoard extends JPanel{
         switch (atHeadPos){
             case 3: //apple
                 s.setHasEaten(true);
-                ++score;
+                score+= pointBoost;
                 newApple();
                 if (t.getDelay()>50)
                     t.setDelay(t.getDelay()-2);
                 break;
             case 4: // delay+10
                 t.setDelay(t.getDelay()+6);
-                disT.start();
+                messageTimer.restart();
                 break;
             case 5: // shorter by 3
                 makeShorter(3);
-                disT.start();
+                messageTimer.restart();
                 //System.out.println("length "+s.getLength()+" pos.size: "+s.getPos().size());
                 break;
             case 6: // bonus points
                 score+=3;
-                disT.start();
+                messageTimer.restart();
                 break;
+            case 7:
+                pointBoost = 2;
+                messageTimer.restart();
+                boosterTimer.restart();
             default:
                 break;
         }
-        //disT.start();
+        //messageTimer.restart();
         //System.out.println("Delay: "+t.getDelay());
         if (score/5 > boostCount){ // new booster every 5 points;
             newBoost();
@@ -261,11 +275,11 @@ public class GameBoard extends JPanel{
             board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
 
-    ActionListener defalutTimerAction = new ActionListener() {
+    ActionListener defaultTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (!menu){
                 //s.disPos(0);
-                //System.out.println(menu);
+                System.out.println(pointBoost);
                 updateTail();
                 s.updatePositions();
                 if (updateHead())
@@ -280,11 +294,17 @@ public class GameBoard extends JPanel{
         }
     };
 
-    ActionListener disTAction = new ActionListener() {
+    ActionListener messageTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             //messageID = 0;
-            disT.stop();
-            disT.setDelay(DisplayDelay);
+            messageTimer.stop();
+        }
+    };
+
+    ActionListener boosterTimerAction = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            boosterTimer.stop();
+            pointBoost = 1;
         }
     };
 
@@ -307,6 +327,7 @@ public class GameBoard extends JPanel{
         newApple();
         score = 0;
         boostCount = 0;
+        pointBoost = 1;
         messageID = 0;
 
         s = new Snake(new int[] {2,3}, 3);
@@ -338,8 +359,7 @@ public class GameBoard extends JPanel{
         getActionMap().put("keyL", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 System.out.println("L pressed");
-                messageID = 4;
-                disT.start();
+                newBoost();
             }
         });
     }
