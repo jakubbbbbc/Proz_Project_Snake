@@ -27,6 +27,8 @@ public class GameBoard extends JPanel{
     private boolean menu;
     private boolean wallAccess;
     private boolean wallInvisible;
+    private boolean wallFlashing;
+    private boolean superFoodVisible;
     private int timesFlashed;
     private Timer t;
     private Timer messageTimer;
@@ -144,7 +146,10 @@ public class GameBoard extends JPanel{
                             paintSpot(i, j, Color.lightGray, g); // points double for 10 seconds
                             break;
                         case 8:
-                            paintSpot(i, j, Color.red, g); // points double for 10 seconds
+                            if (superFoodVisible)
+                                paintSpot(i, j, Color.red, g); // points double for 10 seconds
+                            else
+                                paintSpot(i, j, Color.white, g); // Background
                             break;
                         case 9:
                             paintSpot(i, j, Color.GREEN, g); // points double for 10 seconds
@@ -231,6 +236,9 @@ public class GameBoard extends JPanel{
             board[newBoostPos[0]][newBoostPos[1]] = (int) (Math.random()*4+6); //boost type, default: * NumOfBoosters +4, currently num = 6
         if (8 == board[newBoostPos[0]][newBoostPos[1]]){
             superFoodPos = newBoostPos;
+            superFoodVisible = true;
+            timesFlashed = 0;
+            flashingTimer.restart();
             messageID=8;
             messageTimer.restart();
             boosterTimer.restart();
@@ -294,6 +302,7 @@ public class GameBoard extends JPanel{
                 break;
             case 9: // going through walls for 10s
                 wallAccess = true;
+                wallFlashing = true;
                 messageTimer.restart();
                 boosterTimer.restart();
                 timesFlashed = 0;
@@ -366,12 +375,16 @@ public class GameBoard extends JPanel{
     ActionListener flashingTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (timesFlashed< BoosterDelay/FlashingDelay){ // times to repeat
-                wallInvisible = !wallInvisible;
+                if (wallFlashing)
+                    wallInvisible = !wallInvisible;
+                superFoodVisible = !superFoodVisible;
                 ++timesFlashed;
                 flashingTimer.restart();
             }
-            else
+            else {
                 wallInvisible = false;
+                superFoodVisible = false;
+            }
         }
     };
 
@@ -399,6 +412,7 @@ public class GameBoard extends JPanel{
 
         wallAccess = false;
         wallInvisible = false;
+        wallFlashing = false;
         timesFlashed = 0;
 
         s = new Snake(new int[] {2,3}, 3);
