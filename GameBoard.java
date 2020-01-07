@@ -16,15 +16,22 @@ public class GameBoard extends JPanel{
     private static final int DELAY = 200; //200 default
     private static final int DisplayDelay = 3000; // for messages
     private static final int BoosterDelay= 10000; //200 default
+    private static final int FlashingDelay= 500; //for wall flashing
     private int[][] board;
+    private int[] superFoodPos;
+    private int[] boosterPos;
    // private int[] applePos;
     private Snake s;
    // private boolean done;
     private boolean alreadyMoved;
     private boolean menu;
+    private boolean wallAccess;
+    private boolean wallInvisible;
+    private int timesFlashed;
     private Timer t;
     private Timer messageTimer;
     private Timer boosterTimer;
+    private Timer flashingTimer;
     private int score;
     private int highScore;
     private int boostCount; // to spawn boosters
@@ -57,6 +64,9 @@ public class GameBoard extends JPanel{
         t= new Timer(DELAY, defaultTimerAction);
         messageTimer = new Timer(DisplayDelay, messageTimerAction);
         boosterTimer = new Timer(BoosterDelay, boosterTimerAction);
+        flashingTimer = new Timer (FlashingDelay, flashingTimerAction);
+
+        boosterPos = new int[]{0, 0};
 
         //t.start();
 
@@ -67,7 +77,7 @@ public class GameBoard extends JPanel{
     public JFrame iniGUI(){
         JFrame f=new JFrame("Snake");//creating instance of JFrame
         //setPreferredSize(new Dimension(800, 800));
-        f.setSize(BoardX * SpotSize+15, BoardY * SpotSize+37+30); // 15 = poprawka, 37 = poprawka, 30 = na scorsy
+        f.setSize(BoardX * SpotSize+16, BoardY * SpotSize+37+30); // 15 = poprawka, 37 = poprawka, 30 = na scorsy
         //f.setSize(800,400);
         f.setVisible(true);//making the frame visible
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -105,37 +115,53 @@ public class GameBoard extends JPanel{
             g.setFont(new Font("Monaco", Font.PLAIN, 40));
             g.drawString("Press Space to Play", 120, BoardY*SpotSize/2+80);
         }
-        else for (int i = 0; i < BoardX; ++i) {
-            for (int j = 0; j < BoardY; ++j) {
-                switch (board[i][j]){
-                    case 0:
-                        paintSpot(i, j, Color.white, g); // Background
-                        break;
-                    case 1:
-                        paintSpot(i, j, Color.gray, g); // Body
-                        break;
-                    case 2:
-                        paintSpot(i, j, Color.darkGray, g); // Head
-                        break;
-                    case 3:
-                        paintImage(i, j, appleImage, g); // Apple
-                        break;
-                    case 4:
-                        paintSpot(i, j, Color.blue, g); // delay+10
-                        break;
-                    case 5:
-                        paintSpot(i, j, Color.ORANGE, g); // length-5
-                        break;
-                    case 6:
-                        paintSpot(i, j, Color.BLACK, g); // length-5
-                        break;
-                    case 7:
-                        paintSpot(i, j, Color.lightGray, g); // length-5
-                        break;
-                    default:
-                        break;
+        else {
+            for (int i = 0; i < BoardX; ++i) {
+                for (int j = 0; j < BoardY; ++j) {
+                    switch (board[i][j]) {
+                        case 0:
+                            paintSpot(i, j, Color.white, g); // Background
+                            break;
+                        case 1:
+                            paintSpot(i, j, Color.gray, g); // Body
+                            break;
+                        case 2:
+                            paintSpot(i, j, Color.darkGray, g); // Head
+                            break;
+                        case 3:
+                            paintImage(i, j, appleImage, g); // Apple
+                            break;
+                        case 4:
+                            paintSpot(i, j, Color.blue, g); // delay+6
+                            break;
+                        case 5:
+                            paintSpot(i, j, Color.ORANGE, g); // length-3
+                            break;
+                        case 6:
+                            paintSpot(i, j, Color.BLACK, g); // bonus 3 points
+                            break;
+                        case 7:
+                            paintSpot(i, j, Color.lightGray, g); // points double for 10 seconds
+                            break;
+                        case 8:
+                            paintSpot(i, j, Color.red, g); // points double for 10 seconds
+                            break;
+                        case 9:
+                            paintSpot(i, j, Color.GREEN, g); // points double for 10 seconds
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
+            if (!wallInvisible) {
+                g.setColor(Color.black);
+                g.drawLine(0, 0, BoardX * SpotSize, 0);
+                g.drawLine(0, 0, 0, BoardY * SpotSize);
+                g.drawLine(BoardX * SpotSize, 0, BoardX * SpotSize, BoardY * SpotSize);
+                g.drawLine(0, BoardY * SpotSize, BoardX * SpotSize, BoardY * SpotSize);
+            }
+
         }
     }
 
@@ -156,6 +182,12 @@ public class GameBoard extends JPanel{
                 break;
             case 7:
                 message = "Points count double for " + BoosterDelay/1000 + " seconds!";
+                break;
+            case 8:
+                message = "Super food available for " + BoosterDelay/1000 + " seconds!";
+                break;
+            case 9:
+                message = "You can go through walls " + BoosterDelay/1000 + " seconds!";
                 break;
             default:
                 message = "";
@@ -188,20 +220,30 @@ public class GameBoard extends JPanel{
     }
 
     public void newBoost(){
-        int[] boostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
+        board[boosterPos[0]][boosterPos[1]] = 0;
+        int[] newBoostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
         boolean isOk = true;
-        if (board[boostPos[0]][boostPos[1]] != 0) {
+        if (board[newBoostPos[0]][newBoostPos[1]] != 0) {
             isOk = false;
             newBoost();
         }
         if (isOk)
-            board[boostPos[0]][boostPos[1]] = (int) (Math.random()*4+4); //boost type, default: * NumOfBoosters +4, currently num = 4
-        //System.out.println("boost pos: " + boostPos[0] + ", " + boostPos[1]);
-        System.out.println(board[boostPos[0]][boostPos[1]]);
+            board[newBoostPos[0]][newBoostPos[1]] = (int) (Math.random()*4+6); //boost type, default: * NumOfBoosters +4, currently num = 6
+        if (8 == board[newBoostPos[0]][newBoostPos[1]]){
+            superFoodPos = newBoostPos;
+            messageID=8;
+            messageTimer.restart();
+            boosterTimer.restart();
+        }
+        else
+            boosterPos = newBoostPos;
+        //System.out.println("boost pos: " + newBoostPos[0] + ", " + newBoostPos[1]);
+        //System.out.println(board[newBoostPos[0]][newBoostPos[1]]);
     }
 
     public boolean updateHead(){
         int hpx = s.getHeadPos()[0], hpy= s.getHeadPos()[1];
+
         if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1) {
             //t.stop();
             System.out.println("pozycja "+ hpx + ", " + hpy + " jest słaba");
@@ -241,10 +283,22 @@ public class GameBoard extends JPanel{
                 score+=3;
                 messageTimer.restart();
                 break;
-            case 7:
+            case 7: // points *2
                 pointBoost = 2;
                 messageTimer.restart();
                 boosterTimer.restart();
+                break;
+            case 8: // superFood (10 pts)
+                score += 10;
+                boostCount += 2; // to not display new booster
+                break;
+            case 9: // going through walls for 10s
+                wallAccess = true;
+                messageTimer.restart();
+                boosterTimer.restart();
+                timesFlashed = 0;
+                flashingTimer.restart();
+                break;
             default:
                 break;
         }
@@ -279,15 +333,13 @@ public class GameBoard extends JPanel{
         public void actionPerformed(ActionEvent evt) {
             if (!menu){
                 //s.disPos(0);
-                System.out.println(pointBoost);
+                //System.out.println(pointBoost);
                 updateTail();
-                s.updatePositions();
-                if (updateHead())
-                    repaint();
-                else {
+                s.updatePositions(wallAccess, BoardX, BoardY);
+                if (!updateHead()) {
                     menu = true;
-                    repaint();
                 }
+                repaint();
                 alreadyMoved= false;
                 //System.out.println(s.getLength());
             }
@@ -305,6 +357,21 @@ public class GameBoard extends JPanel{
         public void actionPerformed(ActionEvent evt) {
             boosterTimer.stop();
             pointBoost = 1;
+            if (superFoodPos !=null)
+                board[superFoodPos[0]][superFoodPos[1]] = 0;
+            wallAccess = false;
+        }
+    };
+
+    ActionListener flashingTimerAction = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            if (timesFlashed< BoosterDelay/FlashingDelay){ // times to repeat
+                wallInvisible = !wallInvisible;
+                ++timesFlashed;
+                flashingTimer.restart();
+            }
+            else
+                wallInvisible = false;
         }
     };
 
@@ -329,6 +396,10 @@ public class GameBoard extends JPanel{
         boostCount = 0;
         pointBoost = 1;
         messageID = 0;
+
+        wallAccess = false;
+        wallInvisible = false;
+        timesFlashed = 0;
 
         s = new Snake(new int[] {2,3}, 3);
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;

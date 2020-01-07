@@ -61,7 +61,7 @@ public class Snake<headPos> {
         return positions;
     }
 
-    public void updatePositions() {
+    public void updatePositions(boolean wallAccess, int boardX, int boardY) {
         if (!hasEaten){
             positions.remove(tailPos);
             tailPos= positions.get(0);
@@ -73,16 +73,28 @@ public class Snake<headPos> {
         prevHeadPos=new int[] {headPos[0], headPos[1]};
         switch (dir){
             case 0://right
-                headPos= new int[] {headPos[0]+1, headPos[1]};
+                if (wallAccess && headPos[0]+1 == boardX)
+                    headPos= new int[] {0, headPos[1]};
+                else
+                    headPos= new int[] {headPos[0]+1, headPos[1]};
                 break;
             case 1://up
-                headPos= new int[] {headPos[0], headPos[1]-1};
+                if (wallAccess && headPos[1]-1 == -1)
+                    headPos= new int[] {headPos[0], boardY-1};
+                else
+                    headPos= new int[] {headPos[0], headPos[1]-1};
                 break;
             case 2://left
-                headPos= new int[] {headPos[0]-1, headPos[1]};
+                if (wallAccess && headPos[0]-1 == -1)
+                    headPos= new int[] {boardX-1, headPos[1]};
+                else
+                    headPos= new int[] {headPos[0]-1, headPos[1]};
                 break;
             case 3://down
-                headPos= new int[] {headPos[0], headPos[1]+1};
+                if (wallAccess && headPos[1]+1 == boardY)
+                    headPos= new int[] {headPos[0], 0};
+                else
+                    headPos= new int[] {headPos[0], headPos[1]+1};
                 break;
             default:
                 System.out.println("Wrong direction!");
