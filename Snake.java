@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 
 public class Snake<headPos> {
@@ -9,6 +10,10 @@ public class Snake<headPos> {
     private int dir;
 
 
+    /**
+     * creates a new snake, length =3, moving right with a head at a specified position
+     * @param initHeadPos
+     */
     public Snake(int[] initHeadPos) {
         headPos = initHeadPos;
         length = 3;
@@ -46,10 +51,12 @@ public class Snake<headPos> {
         return length;
     }
 
-    public ArrayList<int[]> getPos () {
-        return positions;
-    }
-
+    /**
+     * moves the sake depending on the direction
+     * @param wallAccess
+     * @param boardX
+     * @param boardY
+     */
     public void updatePositions(boolean wallAccess, int boardX, int boardY) {
         if (!hasEaten){
             positions.remove(tailPos);
@@ -91,11 +98,18 @@ public class Snake<headPos> {
         positions.add(headPos);
     }
 
+    /**
+     * changes the direction the snake is moving in
+     * @param newDir
+     */
     public void changeDir(int newDir){
         if (newDir%2 != dir%2) //no turning around
             dir=newDir;
     }
 
+    /**
+     * removes the last position of the snake
+     */
     public void removeTail(){
         positions.remove(tailPos);
         tailPos= positions.get(0);

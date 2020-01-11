@@ -1,7 +1,5 @@
 import org.junit.Test;
 
-import javax.swing.*;
-
 public class Tester {
     @Test
     public void snakeTest()

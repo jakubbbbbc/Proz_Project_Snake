@@ -44,7 +44,6 @@ public class GameBoard extends JPanel{
     String playerName;
     String highScorePlayerName;
 
-
     public GameBoard(){
         /*board = new int[BoardX][BoardY];
         newApple();
@@ -83,16 +82,22 @@ public class GameBoard extends JPanel{
 
     }
 
+    /**
+     * creates a GUI
+     * @return JFrame
+     */
     public JFrame iniGUI(){
-        JFrame f=new JFrame("Snake");//creating instance of JFrame
-        //setPreferredSize(new Dimension(800, 800));
+        JFrame f=new JFrame("Snake");
         f.setSize(BoardX * SpotSize+16, BoardY * SpotSize+37+60); // 15 = poprawka, 37 = poprawka, 60 = na scorsy
-        //f.setSize(800,400);
         f.setVisible(true);//making the frame visible
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         return f;
     }
 
+    /**
+     * creates a JOptionPane to specify name
+     * @return to playerName
+     */
     public String askForName(){
         String name;
         name = JOptionPane.showInputDialog(this,
@@ -100,19 +105,16 @@ public class GameBoard extends JPanel{
                 "Insert your username",
                 JOptionPane.QUESTION_MESSAGE
         );
-        if (null == name) {
-
-            name = "unknown";
-        }
-
-        //name = name.trim();
-        if ("".equals(name) || name.length()>10) {
+        if (null == name || "".equals(name) || name.length()>10)
             return "unknown";
-        } else {
-           return name;
-        }
+        else
+            return name;
     }
 
+    /**
+     * asks to specify the snake color
+     * @return to snakeColor
+     */
     public Color askForSnakeColor(){
         String temp = JOptionPane.showInputDialog(this,
                 "1 - gray\n2 - red\n3 - blue\n4 - black\n5 - orange",
@@ -137,35 +139,21 @@ public class GameBoard extends JPanel{
         }
     }
 
-    public void game(){
-        //GameBoard b= new GameBoard();
-        iniGUI().add(this);
-
-        //game loop
-        /*while (true) {
-            //System.out.println(s.getHeadPos()[0]);
-            if (menu){
-                System.out.println("menu");
-            }
-            //t.restart(); żeby nie pisało dwa razy??
-            //System.out.println(s.getHeadPos()[0]);
-        }*/
-    }
-
+    /**
+     * paints the menu or game screen
+     * @param g
+     */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); //clears display
 
         g.setColor(Color.black);
         g.setFont(new Font("Monaco", Font.BOLD, 15));
-        g.drawString(playerName + " score: "+score, 0, BoardY * SpotSize+20); //+20 = poprawka
+        g.drawString(playerName + " score: "+score, 0, BoardY * SpotSize+20); //+20 = adjustment
         g.drawString("High score ("+highScorePlayerName + "): "+ highScore, 0, BoardY * SpotSize+45);
-        //g.drawString(playerName, 300, BoardY * SpotSize+20);
-        //System.out.println(playerName);
         if (messageTimer.isRunning())
             displayMessage(messageID, g);
 
         if (menu){
-            //TODO display highScore and player
             g.setColor(Color.black);
             g.setFont(new Font("Monaco", Font.PLAIN, 40));
             g.drawString("Press Space to Play", 120, BoardY*SpotSize/2+80);
@@ -223,6 +211,11 @@ public class GameBoard extends JPanel{
         }
     }
 
+    /**
+     * displays appropriate message on the bottom of the screen
+     * @param messageID determines message content
+     * @param g
+     */
     public void displayMessage(int messageID, Graphics g){
         String message = "";
         switch (messageID){
@@ -249,22 +242,37 @@ public class GameBoard extends JPanel{
                 break;
             default:
                 message = "";
-                System.out.println("Wrong message ID, go to displayMessage()");
                 break;
         }
         g.drawString(message, 250, BoardY * SpotSize+20);
     }
 
+    /**
+     * paints spot on depending on the value of board[x][y]
+     * @param x coordinate
+     * @param y coordinate
+     * @param c color
+     * @param g
+     */
     public void paintSpot(int x, int y, Color c, Graphics g) {
         g.setColor(c);
-        //appleImage.paintIcon(this, g, x* SpotSize, y*SpotSize);
-        g.fillRect(x* SpotSize, y*SpotSize, SpotSize, SpotSize);
+        g.fillRect(x * SpotSize, y * SpotSize, SpotSize, SpotSize);
     }
 
+    /**
+     * paints the icon on board[x][y]
+     * @param x
+     * @param y
+     * @param icon
+     * @param g
+     */
     public void paintImage(int x, int y, ImageIcon icon, Graphics g){
         icon.paintIcon(this, g, x* SpotSize, y*SpotSize);
     }
 
+    /**
+     * sets value of a new place on board to apple value (3)
+     */
     public void newApple(){
         int[] applePos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
         boolean isOk=true;
@@ -274,9 +282,11 @@ public class GameBoard extends JPanel{
         }
         if (isOk)
             board[applePos[0]][applePos[1]] = 3;
-       //m.out.println("apple pos: " + applePos[0] + ", " + applePos[1]);
     }
 
+    /**
+     * sets value of a new place on board to random booster value (4-9)
+     */
     public void newBoost(){
         board[boosterPos[0]][boosterPos[1]] = 0;
         int[] newBoostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
@@ -286,7 +296,7 @@ public class GameBoard extends JPanel{
             newBoost();
         }
         if (isOk)
-            board[newBoostPos[0]][newBoostPos[1]] = (int) (Math.random()*4+6); //boost type, default: * NumOfBoosters +4, currently num = 6
+            board[newBoostPos[0]][newBoostPos[1]] = (int) (Math.random()*6+4); //boost type, default: * NumOfBoosters +4, currently num = 6
         if (8 == board[newBoostPos[0]][newBoostPos[1]]){
             superFoodPos = newBoostPos;
             superFoodVisible = true;
@@ -298,18 +308,17 @@ public class GameBoard extends JPanel{
         }
         else
             boosterPos = newBoostPos;
-        //System.out.println("boost pos: " + newBoostPos[0] + ", " + newBoostPos[1]);
-        //System.out.println(board[newBoostPos[0]][newBoostPos[1]]);
     }
 
+    /**
+     * checks for collision or potential food eaten
+     * @return if the snake has't hit something
+     */
     public boolean updateHead(){
         int hpx = s.getHeadPos()[0], hpy= s.getHeadPos()[1];
 
-        if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1) {
-            //t.stop();
-            System.out.println("pozycja "+ hpx + ", " + hpy + " jest słaba");
+        if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1)
             return false;
-        }
         else{
             if (board[hpx][hpy] > 2)
                 hasEaten();
@@ -319,6 +328,9 @@ public class GameBoard extends JPanel{
         }
     }
 
+    /**
+     * performs action depending on what time of food was consumed
+     */
     public void hasEaten() {
         //what food?
         int atHeadPos = board[s.getHeadPos()[0]][s.getHeadPos()[1]];
@@ -338,7 +350,6 @@ public class GameBoard extends JPanel{
             case 5: // shorter by 3
                 makeShorter(3);
                 messageTimer.restart();
-                //System.out.println("length "+s.getLength()+" pos.size: "+s.getPos().size());
                 break;
             case 6: // bonus points
                 score+=3;
@@ -364,8 +375,6 @@ public class GameBoard extends JPanel{
             default:
                 break;
         }
-        //messageTimer.restart();
-        //System.out.println("Delay: "+t.getDelay());
         if (score/5 > boostCount){ // new booster every 5 points;
             newBoost();
             ++boostCount;
@@ -376,27 +385,33 @@ public class GameBoard extends JPanel{
             highScorePlayerName = playerName;
             saveHighScoreAndPlayer();
         }
-        //System.out.println(score+"\n"+highScore+"\n");
     }
 
+    /**
+     * removes tail of snake n times
+     * @param n how much shorter the snake will be
+     */
     public void makeShorter(int n){
         for (int i=0; i<n; ++i){
             board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
             s.removeTail();
         }
-        //board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
 
-    public void updateTail(){
-        if(!s.getHasEaten())
+    /**
+     * if the snake didn't eat, sets board at tail position to 0
+     */
+    public void updateTail() {
+        if (!s.getHasEaten())
             board[s.getTailPos()[0]][s.getTailPos()[1]] = 0;
     }
 
+    /**
+     * updates and repaints board and scores during the game
+     */
     ActionListener defaultTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (!menu){
-                //s.disPos(0);
-                //System.out.println(pointBoost);
                 updateTail();
                 s.updatePositions(wallAccess, BoardX, BoardY);
                 if (!updateHead()) {
@@ -404,18 +419,22 @@ public class GameBoard extends JPanel{
                 }
                 repaint();
                 alreadyMoved= false;
-                //System.out.println(s.getLength());
             }
         }
     };
 
+    /**
+     * for displaying messages
+     */
     ActionListener messageTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            //messageID = 0;
             messageTimer.stop();
         }
     };
 
+    /**
+     * for some boosters working time
+     */
     ActionListener boosterTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             boosterTimer.stop();
@@ -426,6 +445,9 @@ public class GameBoard extends JPanel{
         }
     };
 
+    /**
+     * for flashing elements
+     */
     ActionListener flashingTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (timesFlashed< BoosterDelay/FlashingDelay){ // times to repeat
@@ -442,11 +464,13 @@ public class GameBoard extends JPanel{
         }
     };
 
+    /**
+     * space initializes game when in menu
+     */
     public void addKeySpace() {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "keySpace");
         getActionMap().put("keySpace", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                //System.out.print("lalalal");
                 if (menu){
                     gameIni();
                     menu = false;
@@ -455,6 +479,9 @@ public class GameBoard extends JPanel{
         });
     }
 
+    /**
+     * initialize everything for a new game and start it
+     */
     public void gameIni(){
         board = new int[BoardX][BoardY];
 
@@ -477,12 +504,14 @@ public class GameBoard extends JPanel{
         t.start();
     }
 
+    /**
+     * for pause during the game
+     */
     public void addKeyP() {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "keyP");
         getActionMap().put("keyP", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 if (!menu) {
-                    System.out.println("P pressed");
                     if (t.isRunning())
                         t.stop();
                     else
@@ -493,6 +522,9 @@ public class GameBoard extends JPanel{
         });
     }
 
+    /**
+     * special actions for developer use
+     */
     public void addKeyL() {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("L"), "keyL");
         getActionMap().put("keyL", new AbstractAction() {
@@ -503,6 +535,11 @@ public class GameBoard extends JPanel{
         });
     }
 
+    /**
+     * connects the given key with changing the snake direction
+     * @param key
+     * @param newDir
+     */
     public void addKeyBind(String key, int newDir) {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), key);
         getActionMap().put(key, new AbstractAction() {
@@ -510,11 +547,13 @@ public class GameBoard extends JPanel{
                 if (!alreadyMoved)
                     s.changeDir(newDir);
                 alreadyMoved = true;
-               // done= true;
             }
         });
     }
 
+    /**
+     * saves high score and player with high score to a txt file
+     */
     public void saveHighScoreAndPlayer(){
         try {
             PrintWriter out = new PrintWriter("highScore.txt");
@@ -526,20 +565,15 @@ public class GameBoard extends JPanel{
         }
     }
 
+    /**
+     * reads high score and player with high score from a txt file
+     */
     public void readHighScoreAndPlayer(){
         File reader = new File("highScore.txt");
-       // String odczyt = "";
         try {
-            // Utworzenie obiektu typu String
             Scanner sc = new Scanner(reader);
             highScore=Integer.parseInt(sc.next());
             highScorePlayerName=sc.next();
-            // Odczytywanie kolejnych linii pliku dopóki są kolejne linie
-            /*while (sc.hasNextLine()) {
-                // Do łańcucha znaków dodawana jest zawartość kolejnej linii
-                // oraz znak \n oznaczający następną linię
-                odczyt = odczyt + skaner.nextLine() + "\n";
-            }*/
         } catch (FileNotFoundException e) {
             System.out.println("Brak Pliku do odczytania!");
         }
@@ -548,7 +582,9 @@ public class GameBoard extends JPanel{
     public int[][] getBoard(){
         return board;
     }
-     public Snake getSnake(){
+
+    public Snake getSnake(){
         return s;
      }
+
 }
