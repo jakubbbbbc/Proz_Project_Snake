@@ -20,10 +20,8 @@ public class GameBoard extends JPanel{
     private int[][] board;
     private int[] superFoodPos;
     private int[] boosterPos;
-   // private int[] applePos;
     private Snake s;
     private Color snakeColor;
-   // private boolean done;
     private boolean alreadyMoved;
     private boolean menu;
     private boolean wallAccess;
@@ -45,13 +43,6 @@ public class GameBoard extends JPanel{
     String highScorePlayerName;
 
     public GameBoard(){
-        /*board = new int[BoardX][BoardY];
-        newApple();
-        s = new Snake(new int[] {2,3}, 3);
-        board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
-        board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
-        board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;*/
-        //done = false;
         alreadyMoved= false;
         menu = true;
 
@@ -72,14 +63,10 @@ public class GameBoard extends JPanel{
 
         boosterPos = new int[]{0, 0};
 
-        //t.start();
-
         appleImage = new ImageIcon("apple1.png");
 
-        //playerName = "default";
         playerName = askForName();
         snakeColor = askForSnakeColor();
-
     }
 
     /**
@@ -88,7 +75,7 @@ public class GameBoard extends JPanel{
      */
     public JFrame iniGUI(){
         JFrame f=new JFrame("Snake");
-        f.setSize(BoardX * SpotSize+16, BoardY * SpotSize+37+60); // 15 = poprawka, 37 = poprawka, 60 = na scorsy
+        f.setSize(BoardX * SpotSize+16, BoardY * SpotSize+37+60); // 16, 37 - adjustments, 60 - for scores and messages on the bottom
         f.setVisible(true);//making the frame visible
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         return f;
