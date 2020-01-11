@@ -122,7 +122,7 @@ public class GameBoard extends JPanel{
 
         if (null == temp)
             temp = "";
-        
+
         switch (temp){
             case "2":
                 return Color.red;
@@ -469,7 +469,7 @@ public class GameBoard extends JPanel{
         wallFlashing = false;
         timesFlashed = 0;
 
-        s = new Snake(new int[] {2,3}, 3);
+        s = new Snake(new int[] {2,3});
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
         board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
         board[s.getTailPos()[0]][s.getTailPos()[1]] = 1;
@@ -545,5 +545,10 @@ public class GameBoard extends JPanel{
         }
     }
 
-
+    public int[][] getBoard(){
+        return board;
+    }
+     public Snake getSnake(){
+        return s;
+     }
 }

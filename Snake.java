@@ -9,23 +9,12 @@ public class Snake<headPos> {
     private int dir;
 
 
-    public Snake(int[] initHeadPos, int initLength) {
+    public Snake(int[] initHeadPos) {
         headPos = initHeadPos;
-        length = initLength;
+        length = 3;
         hasEaten=false;
         dir = 0;//right
         positions = new ArrayList<int[]>();
-        //positions.add(headPos);
-        /*if (1 == length) {
-            prevHeadPos = null;
-            tailPos = new int[]{headPos[0], headPos[1]};
-        }
-        else for (int i = 1; i < length; ++i) {
-            int[] temp = new int[]{headPos[0] - i, headPos[1]};
-            positions.add(0, temp);
-            if (1 == i) prevHeadPos = temp;
-            if (length - 1 == i) tailPos = temp;
-        }*/
         prevHeadPos = new int[] {headPos[0]-1, headPos[1] };
         tailPos = new int[] {headPos[0]-2, headPos[1] };
         positions.add(tailPos);
@@ -103,7 +92,7 @@ public class Snake<headPos> {
     }
 
     public void changeDir(int newDir){
-        if (newDir%2 != dir%2)
+        if (newDir%2 != dir%2) //no turning around
             dir=newDir;
     }
 
@@ -112,6 +101,5 @@ public class Snake<headPos> {
         tailPos= positions.get(0);
         --length;
     }
-
 
 }
