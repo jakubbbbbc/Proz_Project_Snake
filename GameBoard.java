@@ -22,6 +22,7 @@ public class GameBoard extends JPanel{
     private int[] boosterPos;
    // private int[] applePos;
     private Snake s;
+    private Color snakeColor;
    // private boolean done;
     private boolean alreadyMoved;
     private boolean menu;
@@ -40,6 +41,8 @@ public class GameBoard extends JPanel{
     private int pointBoost; // to multiply points
     private int messageID;
     private ImageIcon appleImage;
+    String playerName;
+    String highScorePlayerName;
 
 
     public GameBoard(){
@@ -53,7 +56,7 @@ public class GameBoard extends JPanel{
         alreadyMoved= false;
         menu = true;
 
-        readHighScore();
+        readHighScoreAndPlayer();
 
         addKeyBind("RIGHT", 0);
         addKeyBind("UP", 1);
@@ -74,22 +77,70 @@ public class GameBoard extends JPanel{
 
         appleImage = new ImageIcon("apple1.png");
 
+        //playerName = "default";
+        playerName = askForName();
+        snakeColor = askForSnakeColor();
+
     }
 
     public JFrame iniGUI(){
         JFrame f=new JFrame("Snake");//creating instance of JFrame
         //setPreferredSize(new Dimension(800, 800));
-        f.setSize(BoardX * SpotSize+16, BoardY * SpotSize+37+30); // 15 = poprawka, 37 = poprawka, 30 = na scorsy
+        f.setSize(BoardX * SpotSize+16, BoardY * SpotSize+37+60); // 15 = poprawka, 37 = poprawka, 60 = na scorsy
         //f.setSize(800,400);
         f.setVisible(true);//making the frame visible
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         return f;
     }
 
-    public void game(){
+    public String askForName(){
+        String name;
+        name = JOptionPane.showInputDialog(this,
+                "Username",
+                "Insert your username",
+                JOptionPane.QUESTION_MESSAGE
+        );
+        if (null == name) {
 
-        GameBoard b= new GameBoard();
-        iniGUI().add(b);
+            name = "unknown";
+        }
+
+        //name = name.trim();
+        if ("".equals(name) || name.length()>10) {
+            return "unknown";
+        } else {
+           return name;
+        }
+    }
+
+    public Color askForSnakeColor(){
+        String temp = JOptionPane.showInputDialog(this,
+                "1 - gray\n2 - red\n3 - blue\n4 - black\n5 - orange",
+                "Choose your snake color",
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (null == temp)
+            temp = "";
+        
+        switch (temp){
+            case "2":
+                return Color.red;
+            case "3":
+                return Color.blue;
+            case "4":
+                return Color.black;
+            case "5":
+                return Color.orange;
+            default:
+                return Color.gray;
+        }
+    }
+
+    public void game(){
+        //GameBoard b= new GameBoard();
+        iniGUI().add(this);
+
         //game loop
         /*while (true) {
             //System.out.println(s.getHeadPos()[0]);
@@ -106,8 +157,10 @@ public class GameBoard extends JPanel{
 
         g.setColor(Color.black);
         g.setFont(new Font("Monaco", Font.BOLD, 15));
-        g.drawString("Score: "+score, 0, BoardY * SpotSize+20); //+20 = poprawka
-        g.drawString("High score: "+highScore, 100, BoardY * SpotSize+20);
+        g.drawString(playerName + " score: "+score, 0, BoardY * SpotSize+20); //+20 = poprawka
+        g.drawString("High score ("+highScorePlayerName + "): "+ highScore, 0, BoardY * SpotSize+45);
+        //g.drawString(playerName, 300, BoardY * SpotSize+20);
+        //System.out.println(playerName);
         if (messageTimer.isRunning())
             displayMessage(messageID, g);
 
@@ -125,7 +178,7 @@ public class GameBoard extends JPanel{
                             paintSpot(i, j, Color.white, g); // Background
                             break;
                         case 1:
-                            paintSpot(i, j, Color.gray, g); // Body
+                            paintSpot(i, j, snakeColor, g); // Body
                             break;
                         case 2:
                             paintSpot(i, j, Color.darkGray, g); // Head
@@ -320,7 +373,8 @@ public class GameBoard extends JPanel{
 
         if (score>highScore) {
             highScore = score;
-            saveHighScore();
+            highScorePlayerName = playerName;
+            saveHighScoreAndPlayer();
         }
         //System.out.println(score+"\n"+highScore+"\n");
     }
@@ -461,23 +515,25 @@ public class GameBoard extends JPanel{
         });
     }
 
-    public void saveHighScore(){
+    public void saveHighScoreAndPlayer(){
         try {
             PrintWriter out = new PrintWriter("highScore.txt");
             out.println(highScore);
+            out.println(highScorePlayerName);
             out.close();
         } catch (FileNotFoundException ex) {
             System.out.println("Niestety, nie mogę utworzyć pliku!");
         }
     }
 
-    public void readHighScore(){
+    public void readHighScoreAndPlayer(){
         File reader = new File("highScore.txt");
        // String odczyt = "";
         try {
             // Utworzenie obiektu typu String
             Scanner sc = new Scanner(reader);
             highScore=Integer.parseInt(sc.next());
+            highScorePlayerName=sc.next();
             // Odczytywanie kolejnych linii pliku dopóki są kolejne linie
             /*while (sc.hasNextLine()) {
                 // Do łańcucha znaków dodawana jest zawartość kolejnej linii
