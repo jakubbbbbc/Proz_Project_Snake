@@ -5,7 +5,8 @@ public class SnakeMain {
         t.boardTest();
         */
         GameBoard b = new GameBoard();
-        b.iniGUI().add(b);
+        Interface i = new Interface();
+        i.iniGUI(20,15,30).add(b);
 
     }
 }

@@ -71,18 +71,6 @@ public class GameBoard extends JPanel{
     }
 
     /**
-     * creates a GUI
-     * @return JFrame
-     */
-    public JFrame iniGUI(){
-        JFrame f=new JFrame("Snake");
-        f.setSize(BoardX * SpotSize+16, BoardY * SpotSize+37+60); // 16, 37 - adjustments, 60 - for scores and messages on the bottom
-        f.setVisible(true);//making the frame visible
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        return f;
-    }
-
-    /**
      * creates a JOptionPane to specify name
      * @return to playerName
      */
@@ -129,7 +117,7 @@ public class GameBoard extends JPanel{
 
     /**
      * paints the menu or game screen
-     * @param g
+     * @param g graphics to use
      */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); //clears display
@@ -202,7 +190,7 @@ public class GameBoard extends JPanel{
     /**
      * displays appropriate message on the bottom of the screen
      * @param messageID determines message content
-     * @param g
+     * @param g graphics to use
      */
     public void displayMessage(int messageID, Graphics g){
         AtomicReference<String> message = new AtomicReference<>("");
@@ -240,7 +228,7 @@ public class GameBoard extends JPanel{
      * @param x coordinate
      * @param y coordinate
      * @param c color
-     * @param g
+     * @param g graphics to use
      */
     public void paintSpot(int x, int y, Color c, Graphics g) {
         g.setColor(c);
@@ -249,10 +237,10 @@ public class GameBoard extends JPanel{
 
     /**
      * paints the icon on board[x][y]
-     * @param x
-     * @param y
-     * @param icon
-     * @param g
+     * @param x position x on board
+     * @param y position y on board
+     * @param icon what to draw
+     * @param g graphics to use
      */
     public void paintImage(int x, int y, ImageIcon icon, Graphics g){
         icon.paintIcon(this, g, x* SpotSize, y*SpotSize);
@@ -524,8 +512,8 @@ public class GameBoard extends JPanel{
 
     /**
      * connects the given key with changing the snake direction
-     * @param key
-     * @param newDir
+     * @param key keyboard key
+     * @param newDir direction to bind with the key
      */
     public void addKeyBind(String key, int newDir) {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), key);
@@ -548,9 +536,11 @@ public class GameBoard extends JPanel{
         } catch (FileNotFoundException e) {
             //no file -> can't save highScore. Nothing we can do
         }
-        out.println(highScore);
-        out.println(highScorePlayerName);
-        out.close();
+        if (out != null) {
+            out.println(highScore);
+            out.println(highScorePlayerName);
+            out.close();
+        }
     }
 
     /**
@@ -564,9 +554,11 @@ public class GameBoard extends JPanel{
         } catch (FileNotFoundException e) {
             //no file -> no highScore yet. Everything ok
         }
-        highScore=Integer.parseInt(sc.next());
-        highScorePlayerName=sc.next();
-        sc.close();
+        if (sc != null) {
+        highScore = Integer.parseInt(sc.next());
+        highScorePlayerName = sc.next();
+            sc.close();
+        }
     }
 
     public int[][] getBoard(){
