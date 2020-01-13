@@ -1,7 +1,6 @@
-
 import java.util.ArrayList;
 
-public class Snake<headPos> {
+public class Snake {
 
     private int[] headPos, prevHeadPos, tailPos;
     private int length;
@@ -19,7 +18,7 @@ public class Snake<headPos> {
         length = 3;
         hasEaten=false;
         dir = 0;//right
-        positions = new ArrayList<int[]>();
+        positions = new ArrayList<>();
         prevHeadPos = new int[] {headPos[0]-1, headPos[1] };
         tailPos = new int[] {headPos[0]-2, headPos[1] };
         positions.add(tailPos);

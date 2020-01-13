@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class GameBoard extends JPanel{
@@ -39,8 +40,8 @@ public class GameBoard extends JPanel{
     private int pointBoost; // to multiply points
     private int messageID;
     private ImageIcon appleImage;
-    String playerName;
-    String highScorePlayerName;
+    private String playerName;
+    private String highScorePlayerName;
 
     public GameBoard(){
         alreadyMoved= false;
@@ -204,34 +205,34 @@ public class GameBoard extends JPanel{
      * @param g
      */
     public void displayMessage(int messageID, Graphics g){
-        String message = "";
+        AtomicReference<String> message = new AtomicReference<>("");
         switch (messageID){
             case 3:
                 //for apple, don't change the message
                 break;
             case 4:
-                message = "Snake is now slower!";
+                message.set("Snake is now slower!");
                 break;
             case 5:
-                message = "Snake is now shorter!";
+                message.set("Snake is now shorter!");
                 break;
             case 6:
-                message = "Bonus 3 points received!";
+                message.set("Bonus 3 points received!");
                 break;
             case 7:
-                message = "Points count double for " + BoosterDelay/1000 + " seconds!";
+                message.set("Points count double for " + BoosterDelay / 1000 + " seconds!");
                 break;
             case 8:
-                message = "Super food available for " + BoosterDelay/1000 + " seconds!";
+                message.set("Super food available for " + BoosterDelay / 1000 + " seconds!");
                 break;
             case 9:
-                message = "You can go through walls " + BoosterDelay/1000 + " seconds!";
+                message.set("You can go through walls " + BoosterDelay / 1000 + " seconds!");
                 break;
             default:
-                message = "";
+                message.set("");
                 break;
         }
-        g.drawString(message, 250, BoardY * SpotSize+20);
+        g.drawString(message.get(), 250, BoardY * SpotSize+20);
     }
 
     /**
@@ -516,7 +517,6 @@ public class GameBoard extends JPanel{
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("L"), "keyL");
         getActionMap().put("keyL", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("L pressed");
                 newBoost();
             }
         });
@@ -541,15 +541,16 @@ public class GameBoard extends JPanel{
     /**
      * saves high score and player with high score to a txt file
      */
-    public void saveHighScoreAndPlayer(){
+    public void saveHighScoreAndPlayer() {
+        PrintWriter out = null;
         try {
-            PrintWriter out = new PrintWriter("highScore.txt");
-            out.println(highScore);
-            out.println(highScorePlayerName);
-            out.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Niestety, nie mogę utworzyć pliku!");
+            out = new PrintWriter("highScore.txt");
+        } catch (FileNotFoundException e) {
+            //no file -> can't save highScore. Nothing we can do
         }
+        out.println(highScore);
+        out.println(highScorePlayerName);
+        out.close();
     }
 
     /**
@@ -557,13 +558,15 @@ public class GameBoard extends JPanel{
      */
     public void readHighScoreAndPlayer(){
         File reader = new File("highScore.txt");
+        Scanner sc = null;
         try {
-            Scanner sc = new Scanner(reader);
-            highScore=Integer.parseInt(sc.next());
-            highScorePlayerName=sc.next();
+            sc = new Scanner(reader);
         } catch (FileNotFoundException e) {
-            System.out.println("Brak Pliku do odczytania!");
+            //no file -> no highScore yet. Everything ok
         }
+        highScore=Integer.parseInt(sc.next());
+        highScorePlayerName=sc.next();
+        sc.close();
     }
 
     public int[][] getBoard(){
