@@ -38,9 +38,7 @@ public class EventsManager extends JPanel{
         addKeyP();
         addKeyL();
 
-        //System.out.println("events manager");
         t.restart();
-        //System.out.println(t.isRunning());
     }
 
     /**
@@ -48,9 +46,7 @@ public class EventsManager extends JPanel{
      */
     ActionListener defaultTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            //System.out.println("timer");
             if (!menu){
-                //System.out.println("no menu");
                 b.updateTail();
                 b.getSnake().updatePositions(wallAccess, b.getBoardX(), b.getBoardY());
                 if (!b.updateHead()) {

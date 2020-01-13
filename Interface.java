@@ -1,26 +1,23 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Interface extends JPanel {
 
     private GameBoard b;
     private EventsManager e;
-    private JFrame f;
     private ImageIcon appleImage;
     int messageID;
     private Color snakeColor;
 
     public Interface(){
         b = null;
+        e = null;
         appleImage = new ImageIcon("apple1.png");
     }
 
     /**
      * creates a GUI
-     * @return JFrame
      */
     public void iniGUI(int x, int y, int size){
         JFrame f=new JFrame("Snake");
@@ -29,10 +26,6 @@ public class Interface extends JPanel {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.add(e);
         f.add(this);
-    }
-
-    public void addToF(EventsManager e){
-        f.add(e);
     }
 
     /**
@@ -64,7 +57,6 @@ public class Interface extends JPanel {
 
         if (null == temp)
             temp = "";
-        System.out.println(temp);
         switch (temp){
             case "2":
                 snakeColor = Color.red;
@@ -90,7 +82,6 @@ public class Interface extends JPanel {
      */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); //clears display
-        //System.out.println("paint component");
         g.setColor(Color.black);
         g.setFont(new Font("Monaco", Font.BOLD, 15));
         g.drawString(b.getPlayerName() + " score: "+b.getScore(), 0, b.getBoardY() * b.getSpotSize()+20); //+20 = adjustment
@@ -133,7 +124,7 @@ public class Interface extends JPanel {
                             break;
                         case 8:
                             if (b.getSuperFoodVisible())
-                                paintSpot(i, j, Color.red, g); // points double for 10 seconds
+                                paintSpot(i, j, Color.red, g); // super food (+10 pts)
                             else
                                 paintSpot(i, j, Color.white, g); // Background
                             break;
@@ -157,11 +148,6 @@ public class Interface extends JPanel {
             }
 
         }
-    }
-
-    public void paintAll(){
-        repaint();
-       // System.out.println("painted");
     }
 
     /**
@@ -236,7 +222,4 @@ public class Interface extends JPanel {
         e = em;
     }
 
-    public JFrame getF(){
-        return f;
-    }
 }

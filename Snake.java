@@ -11,7 +11,7 @@ public class Snake {
 
     /**
      * creates a new snake, length =3, moving right with a head at a specified position
-     * @param initHeadPos
+     * @param initHeadPos determines the position of the snake's head
      */
     public Snake(int[] initHeadPos) {
         headPos = initHeadPos;
@@ -52,9 +52,9 @@ public class Snake {
 
     /**
      * moves the sake depending on the direction
-     * @param wallAccess
-     * @param boardX
-     * @param boardY
+     * @param wallAccess determines if the snake go through walls
+     * @param boardX the x size of the board
+     * @param boardY the y size of the board
      */
     public void updatePositions(boolean wallAccess, int boardX, int boardY) {
         if (!hasEaten){
@@ -99,7 +99,7 @@ public class Snake {
 
     /**
      * changes the direction the snake is moving in
-     * @param newDir
+     * @param newDir the new direction of the snake
      */
     public void changeDir(int newDir){
         if (newDir%2 != dir%2) //no turning around

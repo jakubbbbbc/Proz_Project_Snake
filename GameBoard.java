@@ -1,9 +1,3 @@
-import javax.swing.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.Scanner;
-
 public class GameBoard {
 
     private static final int BoardX = 20;
@@ -24,6 +18,7 @@ public class GameBoard {
     private String highScorePlayerName;
     private Interface i;
     private EventsManager e;
+    private TxtManager m;
 
     public GameBoard(){
         i = new Interface();
@@ -35,7 +30,10 @@ public class GameBoard {
 
         i.iniGUI(BoardX, BoardY, SpotSize);
 
-        readHighScoreAndPlayer();
+        m = new TxtManager();
+        m.setGameBoard(this);
+
+        m.readHighScoreAndPlayer();
 
         boosterPos = new int[]{0, 0};
     }
@@ -88,7 +86,6 @@ public class GameBoard {
         int hpx = s.getHeadPos()[0], hpy= s.getHeadPos()[1];
 
         if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1) {
-            System.out.println("you lost");
             return false;
         }
         else{
@@ -155,7 +152,7 @@ public class GameBoard {
         if (score>highScore) {
             highScore = score;
             highScorePlayerName = playerName;
-            saveHighScoreAndPlayer();
+            m.saveHighScoreAndPlayer();
         }
     }
 
@@ -205,41 +202,6 @@ public class GameBoard {
         e.getT().start();
     }
 
-    /**
-     * saves high score and player with high score to a txt file
-     */
-    public void saveHighScoreAndPlayer() {
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter("highScore.txt");
-        } catch (FileNotFoundException e) {
-            //no file -> can't save highScore. Nothing we can do
-        }
-        if (out != null) {
-            out.println(highScore);
-            out.println(highScorePlayerName);
-            out.close();
-        }
-    }
-
-    /**
-     * reads high score and player with high score from a txt file
-     */
-    public void readHighScoreAndPlayer(){
-        File reader = new File("highScore.txt");
-        Scanner sc = null;
-        try {
-            sc = new Scanner(reader);
-        } catch (FileNotFoundException e) {
-            //no file -> no highScore yet. Everything ok
-        }
-        if (sc != null) {
-        highScore = Integer.parseInt(sc.next());
-        highScorePlayerName = sc.next();
-            sc.close();
-        }
-    }
-
     public int getBoardX(){
         return BoardX;
     }
@@ -276,10 +238,6 @@ public class GameBoard {
         return s;
     }
 
-    public Interface getInterface(){
-        return i;
-    }
-
     public int[] getSuperFoodPos(){
         return superFoodPos;
     }
@@ -296,10 +254,6 @@ public class GameBoard {
         return superFoodVisible;
     }
 
-    public EventsManager getEventsManager(){
-        return e;
-    }
-
     public void setWallVisible(boolean newV){
         wallVisible = newV;
     }
@@ -310,5 +264,13 @@ public class GameBoard {
 
     public void setPointBoost (int newPB){
         pointBoost = newPB;
+    }
+
+    public void setHighScore(int newHS){
+        highScore = newHS;
+    }
+
+    public void setHighScorePlayerName(String newPN){
+        highScorePlayerName = newPN;
     }
 }
