@@ -64,19 +64,24 @@ public class Interface extends JPanel {
 
         if (null == temp)
             temp = "";
-
+        System.out.println(temp);
         switch (temp){
             case "2":
                 snakeColor = Color.red;
+                break;
             case "3":
                 snakeColor = Color.blue;
+                break;
             case "4":
                 snakeColor = Color.black;
+                break;
             case "5":
                 snakeColor = Color.orange;
+                break;
             default:
                 snakeColor = Color.gray;
         }
+
     }
 
     /**
