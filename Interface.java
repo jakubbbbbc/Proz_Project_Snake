@@ -8,28 +8,31 @@ public class Interface extends JPanel {
 
     private GameBoard b;
     private EventsManager e;
+    private JFrame f;
     private ImageIcon appleImage;
     int messageID;
     private Color snakeColor;
-    Timer t1;
 
     public Interface(){
         b = null;
         appleImage = new ImageIcon("apple1.png");
-        t1= new Timer(200, defaultTimerAction);
-        t1.start();
     }
 
     /**
      * creates a GUI
      * @return JFrame
      */
-    public JFrame iniGUI(int x, int y, int size){
+    public void iniGUI(int x, int y, int size){
         JFrame f=new JFrame("Snake");
         f.setSize(x * size+16, y * size+37+60); // 16, 37 - adjustments, 60 - for scores and messages on the bottom
         f.setVisible(true);//making the frame visible
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        return f;
+        f.add(e);
+        f.add(this);
+    }
+
+    public void addToF(EventsManager e){
+        f.add(e);
     }
 
     /**
@@ -81,8 +84,8 @@ public class Interface extends JPanel {
      * @param g graphics to use
      */
     protected void paintComponent(Graphics g) {
-        //super.paintComponent(g); //clears display
-        System.out.println("paint component");
+        super.paintComponent(g); //clears display
+        //System.out.println("paint component");
         g.setColor(Color.black);
         g.setFont(new Font("Monaco", Font.BOLD, 15));
         g.drawString(b.getPlayerName() + " score: "+b.getScore(), 0, b.getBoardY() * b.getSpotSize()+20); //+20 = adjustment
@@ -152,7 +155,7 @@ public class Interface extends JPanel {
     }
 
     public void paintAll(){
-        //repaint();
+        repaint();
        // System.out.println("painted");
     }
 
@@ -228,12 +231,7 @@ public class Interface extends JPanel {
         e = em;
     }
 
-    ActionListener defaultTimerAction = new ActionListener() {
-        public void actionPerformed(ActionEvent evt) {
-            System.out.println("t1");
-            //revalidate();
-            setIgnoreRepaint(false);
-            repaint();
-        }
-    };
+    public JFrame getF(){
+        return f;
+    }
 }

@@ -48,7 +48,7 @@ public class EventsManager extends JPanel{
      */
     ActionListener defaultTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-           // System.out.println("timer");
+            //System.out.println("timer");
             if (!menu){
                 //System.out.println("no menu");
                 b.updateTail();
@@ -57,7 +57,7 @@ public class EventsManager extends JPanel{
                     menu = true;
                 }
                 alreadyMoved= false;
-                //i.paintAll();
+                i.repaint();
             }
         }
     };

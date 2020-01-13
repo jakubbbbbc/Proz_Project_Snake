@@ -27,16 +27,17 @@ public class GameBoard {
 
     public GameBoard(){
         i = new Interface();
-        i.setGameBoard(this);
         e = new EventsManager();
-        e.setGameBoard(this);
+        i.setGameBoard(this);
         i.setEventManager(e);
+        e.setGameBoard(this);
         e.setInterface(i);
+
+        i.iniGUI(BoardX, BoardY, SpotSize);
 
         readHighScoreAndPlayer();
 
         boosterPos = new int[]{0, 0};
-
     }
 
     /**
@@ -275,7 +276,7 @@ public class GameBoard {
         return s;
     }
 
-    public Interface getI(){
+    public Interface getInterface(){
         return i;
     }
 
