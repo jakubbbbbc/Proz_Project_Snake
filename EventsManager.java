@@ -2,22 +2,24 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class EventManager extends JPanel{
+public class EventsManager extends JPanel{
 
     private static final int DELAY = 200; //200 default
     private static final int DisplayDelay = 3000; // for messages
     private static final int BoosterDelay= 10000; //200 default
     private static final int FlashingDelay= 500; //for wall flashing
+    private GameBoard b;
+    private Interface i;
     private Timer t;
     private Timer messageTimer;
     private Timer boosterTimer;
     private Timer flashingTimer;
+    private int timesFlashed;
     private boolean menu;
     private boolean alreadyMoved;
     private boolean wallAccess;
-    private GameBoard b;
 
-    public EventManager(){
+    public EventsManager(){
         b = null;
         menu = true;
         alreadyMoved= false;
@@ -35,6 +37,10 @@ public class EventManager extends JPanel{
         addKeySpace();
         addKeyP();
         addKeyL();
+
+        //System.out.println("events manager");
+        t.restart();
+        //System.out.println(t.isRunning());
     }
 
     /**
@@ -42,14 +48,16 @@ public class EventManager extends JPanel{
      */
     ActionListener defaultTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
+           // System.out.println("timer");
             if (!menu){
+                //System.out.println("no menu");
                 b.updateTail();
                 b.getSnake().updatePositions(wallAccess, b.getBoardX(), b.getBoardY());
                 if (!b.updateHead()) {
                     menu = true;
                 }
-                repaint();
                 alreadyMoved= false;
+                //i.paintAll();
             }
         }
     };
@@ -83,15 +91,15 @@ public class EventManager extends JPanel{
     ActionListener flashingTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (timesFlashed< BoosterDelay/FlashingDelay){ // times to repeat
-                if (wallFlashing)
-                    wallInvisible = !wallInvisible;
-                superFoodVisible = !superFoodVisible;
+                if (b.getWallFlashing())
+                    b.setWallVisible(!b.getWallVisible());
+                b.setSuperFoodVisible(!b.getSuperFoodVisible());
                 ++timesFlashed;
                 flashingTimer.restart();
             }
             else {
-                wallInvisible = false;
-                superFoodVisible = false;
+                b.setWallVisible(true);
+                b.setSuperFoodVisible(false);
             }
         }
     };
@@ -158,11 +166,19 @@ public class EventManager extends JPanel{
     }
 
     public void setGameBoard(GameBoard gameBoard) {
-        this.b = gameBoard;
+        b = gameBoard;
+    }
+
+    public void setInterface (Interface newIF){
+        i = newIF;
     }
 
     public void setWallAccess(boolean newValue){
         wallAccess = newValue;
+    }
+
+    public void resetTimesFlashed(){
+        timesFlashed = 0;
     }
 
     public Timer getT(){
@@ -184,4 +200,10 @@ public class EventManager extends JPanel{
     public int getDELAY(){
         return DELAY;
     }
+
+    public boolean getMenu(){
+        return menu;
+    }
+
+
 }

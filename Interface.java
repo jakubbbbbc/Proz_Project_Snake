@@ -1,17 +1,23 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Interface extends JPanel {
 
     private GameBoard b;
-    private EventManager e;
+    private EventsManager e;
     private ImageIcon appleImage;
     int messageID;
+    private Color snakeColor;
+    Timer t1;
 
     public Interface(){
         b = null;
         appleImage = new ImageIcon("apple1.png");
+        t1= new Timer(200, defaultTimerAction);
+        t1.start();
     }
 
     /**
@@ -45,9 +51,8 @@ public class Interface extends JPanel {
 
     /**
      * asks to specify the snake color
-     * @return to snakeColor
      */
-    public Color askForSnakeColor(){
+    public void askForSnakeColor(){
         String temp = JOptionPane.showInputDialog(this,
                 "1 - gray\n2 - red\n3 - blue\n4 - black\n5 - orange",
                 "Choose your snake color",
@@ -59,33 +64,33 @@ public class Interface extends JPanel {
 
         switch (temp){
             case "2":
-                return Color.red;
+                snakeColor = Color.red;
             case "3":
-                return Color.blue;
+                snakeColor = Color.blue;
             case "4":
-                return Color.black;
+                snakeColor = Color.black;
             case "5":
-                return Color.orange;
+                snakeColor = Color.orange;
             default:
-                return Color.gray;
+                snakeColor = Color.gray;
         }
     }
+
     /**
      * paints the menu or game screen
      * @param g graphics to use
      */
-
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g); //clears display
-
+        //super.paintComponent(g); //clears display
+        System.out.println("paint component");
         g.setColor(Color.black);
         g.setFont(new Font("Monaco", Font.BOLD, 15));
         g.drawString(b.getPlayerName() + " score: "+b.getScore(), 0, b.getBoardY() * b.getSpotSize()+20); //+20 = adjustment
         g.drawString("High score ("+b.getHighScorePlayerName() + "): "+ b.getHighScore(), 0, b.getBoardY() * b.getSpotSize()+45);
-        if (messageTimer.isRunning())
+        if (e.getMessageTimer().isRunning())
             displayMessage(messageID, g);
 
-        if (menu){
+        if (e.getMenu()){
             g.setColor(Color.black);
             g.setFont(new Font("Monaco", Font.PLAIN, 40));
             g.drawString("Press Space to Play", 120, b.getBoardY()*b.getSpotSize()/2+80);
@@ -119,7 +124,7 @@ public class Interface extends JPanel {
                             paintSpot(i, j, Color.lightGray, g); // points double for 10 seconds
                             break;
                         case 8:
-                            if (superFoodVisible)
+                            if (b.getSuperFoodVisible())
                                 paintSpot(i, j, Color.red, g); // points double for 10 seconds
                             else
                                 paintSpot(i, j, Color.white, g); // Background
@@ -132,15 +137,23 @@ public class Interface extends JPanel {
                     }
                 }
             }
-            if (!wallInvisible) {
+            if (b.getWallVisible()) {
+                int x = b.getBoardX();
+                int y = b.getBoardX();
+                int size = b.getSpotSize();
                 g.setColor(Color.black);
-                g.drawLine(0, 0, BoardX * SpotSize, 0);
-                g.drawLine(0, 0, 0, BoardY * SpotSize);
-                g.drawLine(BoardX * SpotSize, 0, BoardX * SpotSize, BoardY * SpotSize);
-                g.drawLine(0, BoardY * SpotSize, BoardX * SpotSize, BoardY * SpotSize);
+                g.drawLine(0, 0, x * size, 0);
+                g.drawLine(0, 0, 0, y * size);
+                g.drawLine(x * size, 0, x * size, y * size);
+                g.drawLine(0, y * size, x * size, y * size);
             }
 
         }
+    }
+
+    public void paintAll(){
+        //repaint();
+       // System.out.println("painted");
     }
 
     /**
@@ -164,13 +177,13 @@ public class Interface extends JPanel {
                 message.set("Bonus 3 points received!");
                 break;
             case 7:
-                message.set("Points count double for " + BoosterDelay / 1000 + " seconds!");
+                message.set("Points count double for " + e.getBoosterTimer().getDelay() / 1000 + " seconds!");
                 break;
             case 8:
-                message.set("Super food available for " + BoosterDelay / 1000 + " seconds!");
+                message.set("Super food available for " + e.getBoosterTimer().getDelay() / 1000 + " seconds!");
                 break;
             case 9:
-                message.set("You can go through walls " + BoosterDelay / 1000 + " seconds!");
+                message.set("You can go through walls " + e.getBoosterTimer().getDelay() / 1000 + " seconds!");
                 break;
             default:
                 message.set("");
@@ -208,10 +221,19 @@ public class Interface extends JPanel {
     }
 
     public void setGameBoard(GameBoard gameBoard) {
-        this.b = gameBoard;
+        b = gameBoard;
     }
 
-    public void setEventManager(EventManager em) {
-        this.e = em;
+    public void setEventManager(EventsManager em) {
+        e = em;
     }
+
+    ActionListener defaultTimerAction = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            System.out.println("t1");
+            //revalidate();
+            setIgnoreRepaint(false);
+            repaint();
+        }
+    };
 }

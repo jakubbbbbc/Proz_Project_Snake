@@ -1,17 +1,10 @@
-import javafx.event.Event;
-
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicReference;
 
-
-public class GameBoard extends JPanel{
+public class GameBoard {
 
     private static final int BoardX = 20;
     private static final int BoardY = 15;
@@ -20,12 +13,9 @@ public class GameBoard extends JPanel{
     private int[] superFoodPos;
     private int[] boosterPos;
     private Snake s;
-    private Color snakeColor;
-    private boolean menu;
-    private boolean wallInvisible;
     private boolean wallFlashing;
+    public boolean wallVisible;
     private boolean superFoodVisible;
-    private int timesFlashed;
     private int score;
     private int highScore;
     private int boostCount; // to spawn boosters
@@ -33,16 +23,15 @@ public class GameBoard extends JPanel{
     private String playerName;
     private String highScorePlayerName;
     private Interface i;
-    private EventManager e;
+    private EventsManager e;
 
     public GameBoard(){
         i = new Interface();
         i.setGameBoard(this);
-        e = new EventManager();
+        e = new EventsManager();
         e.setGameBoard(this);
         i.setEventManager(e);
-
-        menu = true;
+        e.setInterface(i);
 
         readHighScoreAndPlayer();
 
@@ -80,7 +69,7 @@ public class GameBoard extends JPanel{
         if (8 == board[newBoostPos[0]][newBoostPos[1]]){
             superFoodPos = newBoostPos;
             superFoodVisible = true;
-            timesFlashed = 0;
+            e.resetTimesFlashed();
             e.getFlashingTimer().restart();
             i.setMessageID(8);
             e.getMessageTimer().restart();
@@ -97,8 +86,10 @@ public class GameBoard extends JPanel{
     public boolean updateHead(){
         int hpx = s.getHeadPos()[0], hpy= s.getHeadPos()[1];
 
-        if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1)
+        if (hpx == BoardX || hpx <0 || hpy<0 || hpy == BoardY || board[hpx][hpy] == 1) {
+            System.out.println("you lost");
             return false;
+        }
         else{
             if (board[hpx][hpy] > 2)
                 hasEaten();
@@ -149,7 +140,7 @@ public class GameBoard extends JPanel{
                 wallFlashing = true;
                 e.getMessageTimer().restart();
                 e.getBoosterTimer().restart();
-                timesFlashed = 0;
+                e.resetTimesFlashed();
                 e.getFlashingTimer().restart();
                 break;
             default:
@@ -191,7 +182,7 @@ public class GameBoard extends JPanel{
      */
     public void gameIni(){
         playerName = i.askForName();
-        snakeColor = i.askForSnakeColor();
+        i.askForSnakeColor();
         board = new int[BoardX][BoardY];
 
         newApple();
@@ -201,9 +192,9 @@ public class GameBoard extends JPanel{
         i.setMessageID(0);
 
         e.setWallAccess(false);
-        wallInvisible = false;
+        wallVisible = true;
         wallFlashing = false;
-        timesFlashed = 0;
+        e.resetTimesFlashed();
 
         s = new Snake(new int[] {2,3});
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
@@ -290,6 +281,30 @@ public class GameBoard extends JPanel{
 
     public int[] getSuperFoodPos(){
         return superFoodPos;
+    }
+
+    public boolean getWallFlashing(){
+        return wallFlashing;
+    }
+
+    public boolean getWallVisible(){
+        return wallVisible;
+    }
+
+    public boolean getSuperFoodVisible(){
+        return superFoodVisible;
+    }
+
+    public EventsManager getEventsManager(){
+        return e;
+    }
+
+    public void setWallVisible(boolean newV){
+        wallVisible = newV;
+    }
+
+    public void setSuperFoodVisible(boolean newV){
+        superFoodVisible = newV;
     }
 
     public void setPointBoost (int newPB){
