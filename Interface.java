@@ -138,7 +138,7 @@ public class Interface extends JPanel {
             }
             if (b.getWallVisible()) {
                 int x = b.getBoardX();
-                int y = b.getBoardX();
+                int y = b.getBoardY();
                 int size = b.getSpotSize();
                 g.setColor(Color.black);
                 g.drawLine(0, 0, x * size, 0);
