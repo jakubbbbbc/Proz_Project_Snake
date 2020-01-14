@@ -14,7 +14,8 @@ public class EventsManager extends JPanel{
     private Timer messageTimer;
     private Timer boosterTimer;
     private Timer flashingTimer;
-    private int timesFlashed;
+    private int timesFlashedWall;
+    private int timesFlashedFood;
     private boolean menu;
     private boolean alreadyMoved;
     private boolean wallAccess;
@@ -86,17 +87,22 @@ public class EventsManager extends JPanel{
      */
     ActionListener flashingTimerAction = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            if (timesFlashed< BoosterDelay/FlashingDelay){ // times to repeat
+            if (timesFlashedWall < BoosterDelay/FlashingDelay){ // times to repeat
                 if (b.getWallFlashing())
                     b.setWallVisible(!b.getWallVisible());
-                b.setSuperFoodVisible(!b.getSuperFoodVisible());
-                ++timesFlashed;
+                ++timesFlashedWall;
                 flashingTimer.restart();
             }
-            else {
+            else
                 b.setWallVisible(true);
-                b.setSuperFoodVisible(false);
+
+            if (timesFlashedFood < BoosterDelay/FlashingDelay){ // times to repeat
+                b.setSuperFoodVisible(!b.getSuperFoodVisible());
+                ++timesFlashedFood;
+                flashingTimer.restart();
             }
+            else
+                b.setSuperFoodVisible(false);
         }
     };
 
@@ -173,8 +179,12 @@ public class EventsManager extends JPanel{
         wallAccess = newValue;
     }
 
-    public void resetTimesFlashed(){
-        timesFlashed = 0;
+    public void resetTimesFlashedWall(){
+        timesFlashedWall = 0;
+    }
+
+    public void resetTimesFlashedFood(){
+        timesFlashedFood = 0;
     }
 
     public Timer getT(){

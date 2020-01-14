@@ -56,7 +56,8 @@ public class GameBoard {
      * sets value of a new place on board to random booster value (4-9)
      */
     public void newBoost(){
-        board[boosterPos[0]][boosterPos[1]] = 0;
+        if (board[boosterPos[0]][boosterPos[1]]>3) //do not set to 0 if it's the snake
+            board[boosterPos[0]][boosterPos[1]] = 0;
         int[] newBoostPos= new int[] {(int)(Math.random() * BoardX), (int)(Math.random() * BoardY)};
         boolean isOk = true;
         if (board[newBoostPos[0]][newBoostPos[1]] != 0) {
@@ -68,7 +69,7 @@ public class GameBoard {
         if (8 == board[newBoostPos[0]][newBoostPos[1]]){
             superFoodPos = newBoostPos;
             superFoodVisible = true;
-            e.resetTimesFlashed();
+            e.resetTimesFlashedFood();
             e.getFlashingTimer().restart();
             i.setMessageID(8);
             e.getMessageTimer().restart();
@@ -90,7 +91,7 @@ public class GameBoard {
         }
         else{
             if (board[hpx][hpy] > 2)
-                hasEaten();
+                ateSomething();
             board[hpx][hpy] = 2;
             board[s.getPrevHeadPos()[0]][s.getPrevHeadPos()[1]] = 1;
             return true;
@@ -98,9 +99,9 @@ public class GameBoard {
     }
 
     /**
-     * performs action depending on what time of food was consumed
+     * performs action depending on what type of food was consumed
      */
-    public void hasEaten() {
+    public void ateSomething() {
         //what food?
         int atHeadPos = board[s.getHeadPos()[0]][s.getHeadPos()[1]];
         i.setMessageID(atHeadPos);
@@ -138,7 +139,7 @@ public class GameBoard {
                 wallFlashing = true;
                 e.getMessageTimer().restart();
                 e.getBoosterTimer().restart();
-                e.resetTimesFlashed();
+                e.resetTimesFlashedWall();
                 e.getFlashingTimer().restart();
                 break;
             default:
@@ -192,7 +193,8 @@ public class GameBoard {
         e.setWallAccess(false);
         wallVisible = true;
         wallFlashing = false;
-        e.resetTimesFlashed();
+        e.resetTimesFlashedWall();
+        e.resetTimesFlashedFood();
 
         s = new Snake(new int[] {2,3});
         board[s.getHeadPos()[0]][s.getHeadPos()[1]] = 2;
