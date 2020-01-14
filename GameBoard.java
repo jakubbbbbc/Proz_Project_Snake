@@ -133,6 +133,7 @@ public class GameBoard {
             case 8: // superFood (10 pts)
                 score += 10;
                 boostCount += 2; // to not display new booster
+                superFoodPos = null;
                 break;
             case 9: // going through walls for 10s
                 e.setWallAccess(true);
