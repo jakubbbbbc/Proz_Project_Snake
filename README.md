@@ -6,4 +6,4 @@ to build:
 
 This project is a part of a Java programming class at the Warsaw University of Technology. The object of this project was to create a fully functional Snake game with additional boosters/ extra types of food.
 
-![alt text](http://url/to/img.png)
+![alt text](https://user-images.githubusercontent.com/28408329/84141792-02d96d80-aa54-11ea-9516-1450bfb72df2.png)
