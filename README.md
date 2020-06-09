@@ -5,3 +5,5 @@ to build:
 - for tests, uncomment the two commented lines in main
 
 This project is a part of a Java programming class at the Warsaw University of Technology. The object of this project was to create a fully functional Snake game with additional boosters/ extra types of food.
+
+![alt text](http://url/to/img.png)
